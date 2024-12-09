@@ -1,0 +1,5 @@
+programa FUNCAO_NAO_DECLARADA;
+
+inicio
+    mostre(chamar calcular(10));
+fim

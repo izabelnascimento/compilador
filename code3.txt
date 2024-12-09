@@ -1,0 +1,16 @@
+programa CALCULO;
+
+var num1, num2, resultado: int;
+
+procedimento multiplicacao;
+
+inicio
+    resultado => num1 * num2;
+fim
+
+inicio
+    num1 => 10;
+    num2 => 5;
+    chamar multiplicacao;
+    mostre(resultado);
+fim

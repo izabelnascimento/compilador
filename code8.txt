@@ -1,0 +1,7 @@
+programa OPERADOR_INVALIDO;
+
+var num: int;
+
+inicio
+    num => 5 $ 2;
+fim

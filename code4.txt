@@ -1,0 +1,14 @@
+programa PARIDADE;
+
+funcao verificar_par (valor: int) retorna bool;
+
+inicio
+    se (valor % 2 == 0) entao
+        retorna verdadeiro;
+    senao
+        retorna falso;
+fim
+
+inicio
+    mostre(chamar verificar_par(10));
+fim

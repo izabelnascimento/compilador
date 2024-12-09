@@ -1,0 +1,7 @@
+programa TIPOS_INVALIDOS;
+
+var num1: inteiro;
+
+inicio
+    num1 => 5;
+fim

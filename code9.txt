@@ -1,0 +1,7 @@
+programa ESCOPOS_INVALIDOS;
+
+mostre(10);
+
+inicio
+    mostre(20);
+fim

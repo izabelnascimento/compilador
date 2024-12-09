@@ -1,0 +1,7 @@
+programa ATRIBUICAO_INCOMPLETA;
+
+var num: int;
+
+inicio
+    num => ;
+fim
