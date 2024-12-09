@@ -17,6 +17,19 @@ class Lexer:
             ('SEMICOLON', r'\;'),
             ('COMMA', r'\,'),
             ('COLON', r'\:'),
+            ('PROGRAM', r'programa'),
+            ('BEGIN', r'inicio'),
+            ('END', r'fim'),
+            ('SHOW', r'mostre'),
+            ('TRUE', r'verdadeiro'),
+            ('FALSE', r'falso'),
+            ('NOT', r'nao'),
+            ('EQUAL', r'=='),
+            ('NOT_EQUAL', r'!='),
+            ('GREATER', r'>'),
+            ('GREATER_EQUAL', r'>='),
+            ('LESS', r'<'),
+            ('LESS_EQUAL', r'<='),
         ]
 
     def tokenize(self, code):
@@ -31,7 +44,7 @@ class Lexer:
                     if token_type == 'WHITESPACE':
                         line_number += match.group(0).count('\n')
                     else:
-                        yield (token_type, match.group(0), line_number)
+                        yield token_type, match.group(0), line_number
                     position = match.end()
                     break
             if not match:
