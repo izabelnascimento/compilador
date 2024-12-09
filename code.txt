@@ -1,2 +1,9 @@
-x = 5
-y = x + 2
+programa CALCULO;
+
+var num1, num2, resultado: int;
+    condicao: bool;
+
+procedimento multiplicacao;
+inicio
+    resultado => num1 * num2;
+fim

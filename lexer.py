@@ -6,7 +6,7 @@ class Lexer:
         self.tokens = [
             ('NUMBER', r'\d+'),
             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-            ('ASSIGN', r'='),
+            ('ASSIGN', r'=>'),
             ('PLUS', r'\+'),
             ('MINUS', r'-'),
             ('MULTIPLY', r'\*'),
@@ -14,6 +14,9 @@ class Lexer:
             ('LPAREN', r'\('),
             ('RPAREN', r'\)'),
             ('WHITESPACE', r'\s+'),
+            ('SEMICOLON', r'\;'),
+            ('COMMA', r'\,'),
+            ('COLON', r'\:'),
         ]
 
     def tokenize(self, code):
