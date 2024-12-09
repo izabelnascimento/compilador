@@ -1,20 +1,25 @@
 from lexer import Lexer
-# from semantic import SemanticAnalyzer
+from syntax import Syntax
 
 
 def main():
-    code = read_code_from_file('code.txt')
-    lexer = Lexer()
-    tokens = list(lexer.tokenize(code))
+    file_path = 'code.txt'
+    code = read_code_from_file(file_path)
+    if not code:
+        return
 
-    print("Tokens:", tokens)
-
-    # semantic_analyzer = SemanticAnalyzer()
-    # try:
-    #     semantic_analyzer.analyze(tokens)
-    #     print("Análise semântica concluída sem erros.")
-    # except Exception as e:
-    #     print(f"Erro semântico: {e}")
+    try:
+        lexer = Lexer()
+        tokens = list(lexer.tokenize(code))
+        print("\nTokens:", tokens)
+        try:
+            syntax = Syntax(tokens)
+            syntax.parse()
+            print("\nAnálise sintática concluída sem erros.")
+        except SyntaxError as e:
+            print(f"\nErro durante a análise sintática: {e}")
+    except SyntaxError as e:
+        print(f"\nErro durante a análise léxica: {e}")
 
 
 def read_code_from_file(file_path):
