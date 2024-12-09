@@ -1,5 +1,6 @@
 import re
 
+
 class Lexer:
     def __init__(self):
         # Define os padrões de tokens
@@ -30,3 +31,4 @@ class Lexer:
                     break
             if not match:
                 raise SyntaxError(f"Unexpected character: {code[position]}")
+        print("Análise Léxica concluída sem erros")
