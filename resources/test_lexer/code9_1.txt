@@ -1,0 +1,7 @@
+/*
+    Este é um exemplo
+    de comentário em bloco.
+    */
+programa inicio
+    mostre "Teste";
+fim

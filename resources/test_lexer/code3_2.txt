@@ -1,0 +1,3 @@
+/* Comentário em bloco não
+programa inicio
+fim

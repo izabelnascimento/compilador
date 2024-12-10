@@ -1,0 +1,4 @@
+programa inicio
+    faca x => x + 1;
+    enquanto (x < 10);
+fim

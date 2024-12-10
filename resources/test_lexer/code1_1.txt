@@ -1,0 +1,4 @@
+programa inicio
+    var int x;
+    x => 10;
+fim

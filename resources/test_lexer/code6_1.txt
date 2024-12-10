@@ -1,0 +1,8 @@
+procedimento imprimir()
+inicio
+    mostre "Texto de exemplo";
+fim
+
+programa inicio
+    chamar imprimir();
+fim

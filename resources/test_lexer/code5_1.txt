@@ -1,0 +1,5 @@
+programa inicio
+    var int resultado;
+    resultado => (3 + 5) * 2;
+    mostre resultado;
+fim
