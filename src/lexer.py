@@ -55,4 +55,3 @@ class Lexer:
                     break
             if not match:
                 raise SyntaxError(f"Unexpected character '{code[position]}' on line {line_number}")
-        print("Análise Léxica concluída sem erros")

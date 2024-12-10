@@ -1,4 +1,3 @@
-import self
 
 
 class Syntax:
@@ -32,16 +31,16 @@ class Syntax:
 
     def body(self):
         """Reconhece o corpo do programa, incluindo blocos de código."""
-    while self.current_token() and self.current_token()[0] != 'END':
-        token_type, value, line_number = self.current_token()
+        while self.current_token() and self.current_token()[0] != 'END':
+            token_type, value, line_number = self.current_token()
 
-        if token_type == 'IDENTIFIER' and value == 'var':
-            self.declaration()
-        elif token_type == 'IDENTIFIER' and value == 'inicio':
-            self.eat('IDENTIFIER')  # Consome 'inicio'
-            self.block()  # Processa o bloco de comandos
-        else:
-            raise SyntaxError(f"Comando inválido na linha {line_number}")
+            if token_type == 'IDENTIFIER' and value == 'var':
+                self.declaration()
+            elif token_type == 'IDENTIFIER' and value == 'inicio':
+                self.eat('IDENTIFIER')  # Consome 'inicio'
+                self.block()  # Processa o bloco de comandos
+            else:
+                raise SyntaxError(f"Comando inválido na linha {line_number}")
 
 def block(self):
     """Reconhece o bloco de comandos dentro de 'inicio ... fim'."""
