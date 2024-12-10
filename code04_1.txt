@@ -1,0 +1,10 @@
+programa BREAK_WHILE;
+
+inicio
+    enquanto (x < 10) faca
+        se (x == 5) entao
+            quebra;
+        fim
+        x => x + 1;
+    fim
+fim

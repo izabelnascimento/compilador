@@ -1,0 +1,5 @@
+programa RETURN_INVALIDO;
+
+inicio
+    retorna 5;  // return fora de uma função
+fim

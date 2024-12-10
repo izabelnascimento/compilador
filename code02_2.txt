@@ -1,0 +1,11 @@
+programa SIMBOLOS;
+
+var x, y: inteiro;  // Tipo inválido
+var condicao: bool;
+
+inicio
+    x => 5;
+    y => 10;
+    condicao => verdadeiro;
+    mostre(x + y);
+fim

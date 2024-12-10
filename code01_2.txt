@@ -1,0 +1,9 @@
+programa 123TOKENS;  // Nome do programa inválido
+
+var num1, num2: int;
+
+inicio
+    num1 => 10;
+    num2 => 20;
+    mostre(num1 + num2);
+fim

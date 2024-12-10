@@ -3,7 +3,7 @@ from syntax import Syntax
 
 
 def main():
-    file_path = 'code.txt' #Nos exemplos do 1 a 4 são acertos, do 5 ao 10 são erros, mas t´não tá se comportando assim. Precisa ser revisto
+    file_path = 'code05_2.txt'
     code = read_code_from_file(file_path)
     if not code:
         return
