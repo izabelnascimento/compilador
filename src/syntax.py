@@ -1,9 +1,14 @@
+from src.util import Util
 
 
 class Syntax:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current_token_index = 0
+
+    def start_syntax(self):
+        self.parse()
+        Util.print_sucess("\nAnálise sintática concluída sem erros.")
 
     def current_token(self):
         """Retorna o token atual."""
@@ -42,19 +47,18 @@ class Syntax:
             else:
                 raise SyntaxError(f"Comando inválido na linha {line_number}")
 
-def block(self):
-    """Reconhece o bloco de comandos dentro de 'inicio ... fim'."""
-    while self.current_token() and self.current_token()[0] != 'END':
-        token_type, value, line_number = self.current_token()
+    def block(self):
+        """Reconhece o bloco de comandos dentro de 'inicio ... fim'."""
+        while self.current_token() and self.current_token()[0] != 'END':
+            token_type, value, line_number = self.current_token()
 
-        if token_type == 'IDENTIFIER':
-            self.statement()
-        elif token_type == 'IDENTIFIER' and value == 'fim':
-            self.eat('IDENTIFIER')  # Consome 'fim' e encerra o bloco
-            return
-        else:
-            raise SyntaxError(f"Comando inválido na linha {line_number}")
-
+            if token_type == 'IDENTIFIER':
+                self.statement()
+            elif token_type == 'IDENTIFIER' and value == 'fim':
+                self.eat('IDENTIFIER')  # Consome 'fim' e encerra o bloco
+                return
+            else:
+                raise SyntaxError(f"Comando inválido na linha {line_number}")
 
     def declaration(self):
         """Reconhece declarações de variáveis."""

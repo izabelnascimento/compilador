@@ -1,5 +1,8 @@
 import re
 
+from src.util import Util
+from src.symbol import Symbol
+
 
 class Lexer:
     def __init__(self):
@@ -49,6 +52,16 @@ class Lexer:
             ('WHILE', r'\benquanto\b'),
             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*')
         ]
+
+    def start_lexer(self, code, file_name):
+        tokens = list(self.tokenize(code))
+        print("\nTokens:", tokens)
+        Util.save_tokens_to_csv(tokens, file_name)
+        symbol_table = Symbol.symbol_table(tokens)
+        print("\nSymbol Table:", symbol_table)
+        Util.save_symbol_table_to_csv(symbol_table, file_name)
+        Util.print_sucess("Análise Léxica concluída sem erros")
+        return tokens
 
     def tokenize(self, code):
         position = 0
