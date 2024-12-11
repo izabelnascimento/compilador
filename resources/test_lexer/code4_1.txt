@@ -1,0 +1,4 @@
+funcao soma(int a, int b): int
+inicio
+    retorna a + b;
+fim

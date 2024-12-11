@@ -1,0 +1,6 @@
+programa inicio
+    se (a == b) entao
+        mostre "Iguais";
+    senao
+        mostre "Diferentes";
+fim

@@ -1,0 +1,4 @@
+programa inicio
+    var int x; // Variável inicializada
+    x => 42;
+fim

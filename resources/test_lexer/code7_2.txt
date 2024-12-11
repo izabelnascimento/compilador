@@ -1,0 +1,4 @@
+programa inicio
+    se (x !=!) entao
+        mostre verdadeiro;
+fim

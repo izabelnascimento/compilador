@@ -1,0 +1,3 @@
+programa inicio
+    var 123abc => 10;
+fim

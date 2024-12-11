@@ -1,0 +1,5 @@
+programa inicio
+    var bool ativo;
+    ativo => verdadeiro e nao falso;
+    mostre ativo;
+fim

@@ -1,0 +1,6 @@
+programa inicio
+    se (x > 5) entao
+        mostre verdadeiro;
+    senao
+        mostre falso;
+fim
