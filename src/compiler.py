@@ -1,6 +1,7 @@
 import sys
 
 from src.lexer import Lexer
+from src.symbol import Symbol
 from src.syntax import Syntax
 
 
@@ -16,6 +17,8 @@ class Compiler:
             lexer = Lexer()
             tokens = list(lexer.tokenize(code))
             print("\nTokens:", tokens)
+            symbol_table = Symbol.symbol_table(tokens)
+            print("\nSymbol Table:", symbol_table)
             self.print_sucess("Análise Léxica concluída sem erros")
             try:
                 syntax = Syntax(tokens)
