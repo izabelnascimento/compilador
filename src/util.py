@@ -26,8 +26,8 @@ class Util:
         sys.stdout.write(f"\033[32m{mensagem}\033[0m\n")
 
     @staticmethod
-    def save_tokens_to_csv(tokens, file_name):
-        with open(f'../resources/out/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
+    def save_tokens_to_csv(tokens, folder, file_name):
+        with open(f'../resources/out/{folder}/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(['Token', 'Lexema', 'Line'])  # Cabeçalho
             for token_type, token_value, token_line in tokens:
@@ -35,8 +35,8 @@ class Util:
         print("Tokens salvos em 'tokens.csv'.")
 
     @staticmethod
-    def save_symbol_table_to_csv(symbol_table, file_name):
-        with open(f'../resources/out/{file_name}_symbol_table.csv', 'w', newline='', encoding='utf-8') as file:
+    def save_symbol_table_to_csv(symbol_table, folder, file_name):
+        with open(f'../resources/out/{folder}/{file_name}_symbol_table.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(['ID', 'Type', 'Line'])  # Cabeçalho
             for symbol in symbol_table:
