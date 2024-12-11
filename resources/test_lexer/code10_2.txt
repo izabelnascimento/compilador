@@ -1,4 +1,4 @@
-procedimento calcular()
+procedimento calcular(]
 inicio
     retorna 10;
 fim

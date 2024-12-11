@@ -5,19 +5,25 @@ class Lexer:
     def __init__(self):
         self.tokens = [
             ('PROGRAM', r'\bprograma\b'),
-            ('ASSIGN', r'=>'),
-            ('NUMBER', r'\d+'),
+            ('ASSIGN', r'=>'),  # Certifique-se de que ASSIGN esteja antes
+            ('EQUAL', r'=='),
+            ('NOT_EQUAL', r'!='),
+            ('GREATER_EQUAL', r'>='),
+            ('LESS_EQUAL', r'<='),
+            ('NUMBER', r'\b\d+\b'),
             ('BREAK', r'\bquebra\b'),
             ('PLUS', r'\+'),
             ('MINUS', r'-(?!>)'),
             ('MULTIPLY', r'\*'),
             ('COMMENT', r'//.*'),
+            ('BLOCK_COMMENT', r'/\*[\s\S]*?\*/'),
             ('DIVIDE', r'/'),
             ('LPAREN', r'\('),
             ('RPAREN', r'\)'),
             ('SEMICOLON', r';'),
             ('COMMA', r','),
             ('COLON', r':'),
+            ('QUOTES', r'\"'),
             ('WHITESPACE', r'\s+'),
             ('BEGIN', r'\binicio\b'),
             ('END', r'\bfim\b'),
@@ -27,13 +33,8 @@ class Lexer:
             ('NOT', r'\bnao\b'),
             ('AND', r'\be\b'),
             ('OR', r'\bou\b'),
-            ('EQUAL', r'=='),
-            ('NOT_EQUAL', r'!='),
             ('GREATER', r'>(?<!-)'),
-            ('GREATER_EQUAL', r'>='),
             ('LESS', r'<'),
-            ('LESS_EQUAL', r'<='),
-            ('SINGLE_ASSIGN', r'='),
             ('VAR', r'\bvar\b'),
             ('INT', r'\bint\b'),
             ('BOOL', r'\bbool\b'),
@@ -46,8 +47,7 @@ class Lexer:
             ('RETURN', r'\bretorna\b'),
             ('CALL', r'\bchamar\b'),
             ('WHILE', r'\benquanto\b'),
-            ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-            ('BLOCK_COMMENT', r'/\*.*?\*/')
+            ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*')
         ]
 
     def tokenize(self, code):
