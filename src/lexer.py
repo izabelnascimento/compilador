@@ -8,7 +8,7 @@ class Lexer:
     def __init__(self):
         self.tokens = [
             ('PROGRAM', r'\bprograma\b'),
-            ('ASSIGN', r'=>'),  # Certifique-se de que ASSIGN esteja antes
+            ('ASSIGN', r'=>'),
             ('EQUAL', r'=='),
             ('NOT_EQUAL', r'!='),
             ('GREATER_EQUAL', r'>='),
@@ -54,6 +54,7 @@ class Lexer:
         ]
 
     def start_lexer(self, code, file_name):
+        print("------------------- ANÁLISE LEXICA -------------------")
         tokens = list(self.tokenize(code))
         print("\nTokens:", tokens)
         Util.save_tokens_to_csv(tokens, 'lexer', file_name)

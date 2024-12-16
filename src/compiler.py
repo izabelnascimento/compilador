@@ -17,7 +17,7 @@ class Compiler:
             tokens = lexer.start_lexer(code, file_name)
             try:
                 syntax = Syntax(tokens)
-                # syntax.start_syntax()
+                syntax.start_syntax()
             except SyntaxError as e:
                 Util.print_error(f"\nErro durante a análise sintática: {e}")
         except SyntaxError as e:
