@@ -7,6 +7,7 @@ class Syntax:
         self.current_token_index = 0
 
     def start_syntax(self):
+        print("\n------------------- ANÁLISE SINTÁTICA -------------------")
         self.parse()
         Util.print_sucess("\nAnálise sintática concluída sem erros.")
 
@@ -19,8 +20,10 @@ class Syntax:
         if self.current_token() and self.current_token()[0] == token_type:
             self.current_token_index += 1
         else:
+            expected = token_type
+            found = self.current_token()[0] if self.current_token() else "EOF"
             raise SyntaxError(
-                f"Esperado {token_type}, mas encontrado {self.current_token()}."
+                f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[2] if self.current_token() else 'desconhecida'}."
             )
 
     def parse(self):
@@ -35,53 +38,101 @@ class Syntax:
         self.body()
 
     def body(self):
-        """Reconhece o corpo do programa, incluindo blocos de código."""
-        while self.current_token() and self.current_token()[0] != 'END':
-            token_type, value, line_number = self.current_token()
-
-            if token_type == 'IDENTIFIER' and value == 'var':
-                self.declaration()
-            elif token_type == 'IDENTIFIER' and value == 'inicio':
-                self.eat('IDENTIFIER')  # Consome 'inicio'
-                self.block()  # Processa o bloco de comandos
-            else:
-                raise SyntaxError(f"Comando inválido na linha {line_number}")
-
-    def block(self):
-        """Reconhece o bloco de comandos dentro de 'inicio ... fim'."""
-        while self.current_token() and self.current_token()[0] != 'END':
-            token_type, value, line_number = self.current_token()
-
-            if token_type == 'IDENTIFIER':
-                self.statement()
-            elif token_type == 'IDENTIFIER' and value == 'fim':
-                self.eat('IDENTIFIER')  # Consome 'fim' e encerra o bloco
-                return
-            else:
-                raise SyntaxError(f"Comando inválido na linha {line_number}")
+        """Reconhece o corpo do programa."""
+        if self.current_token() and self.current_token()[0] == 'VAR':
+            self.declaration()
+        while self.current_token() and self.current_token()[0] in ('PROCEDURE', 'FUNCTION'):
+            self.subroutine()
+        self.actions()
 
     def declaration(self):
         """Reconhece declarações de variáveis."""
-        self.eat('IDENTIFIER')  # 'var'
-        self.eat('IDENTIFIER')  # Nome da variável
-        while self.current_token() and self.current_token()[0] == 'COMMA':
-            self.eat('COMMA')
-            self.eat('IDENTIFIER')  # Mais variáveis
+        self.eat('VAR')
+        while True:
+            self.eat('IDENTIFIER')  # Nome da variável
+            if self.current_token() and self.current_token()[0] == 'COMMA':
+                self.eat('COMMA')
+            else:
+                break
         self.eat('COLON')
-        self.eat('IDENTIFIER')  # Tipo
+        self.type_var()
         self.eat('SEMICOLON')
+        # if self.current_token() and self.current_token()[0] == 'IDENTIFIER':
+        #     self.declaration()  # Declaração múltipla
+
+    def subroutine(self):
+        """Reconhece procedimentos e funções."""
+        if self.current_token()[0] == 'PROCEDURE':
+            self.procedure_declaration()
+        elif self.current_token()[0] == 'FUNCTION':
+            self.function_declaration()
+
+    def procedure_declaration(self):
+        self.eat('PROCEDURE')
+        self.eat('IDENTIFIER')
+        if self.current_token()[0] == 'LPAREN':
+            self.eat('LPAREN')
+            self.parameters()
+            self.eat('RPAREN')
+        self.eat('SEMICOLON')
+        self.body()
+
+    def function_declaration(self):
+        self.eat('FUNCTION')
+        self.eat('IDENTIFIER')
+        if self.current_token()[0] == 'LPAREN':
+            self.eat('LPAREN')
+            self.parameters()
+            self.eat('RPAREN')
+        self.eat('RETURNS')
+        self.eat('IDENTIFIER')
+        self.eat('SEMICOLON')
+        self.body()
+
+    def parameters(self):
+        while True:
+            self.eat('IDENTIFIER')  # Nome do parâmetro
+            self.eat('COLON')
+            self.eat('IDENTIFIER')  # Tipo do parâmetro
+            if self.current_token() and self.current_token()[0] == 'COMMA':
+                self.eat('COMMA')
+            else:
+                break
+
+    def actions(self):
+        if self.current_token() and self.current_token()[0] == 'IDENTIFIER':
+            self.eat('IDENTIFIER')
+            self.assignment()
+        else:
+            self.eat('BEGIN')
+        while self.current_token() and self.current_token()[0] != 'END':
+            self.statement()
+        self.eat('END')
 
     def statement(self):
-        """Reconhece comandos no corpo do programa."""
         token_type, value, line_number = self.current_token()
 
         if token_type == 'IDENTIFIER':
-            self.eat('IDENTIFIER')  # Nome da variável
-            self.eat('ASSIGN')      # Sinal =>
-            self.expression()       # Atribuição de expressão
+            self.eat('IDENTIFIER')
+            if self.current_token()[0] == 'ASSIGN':
+                self.eat('ASSIGN')
+                self.expression()
+            elif self.current_token()[0] == 'LPAREN':  # Chamada de função ou procedimento
+                self.eat('LPAREN')
+                while self.current_token() and self.current_token()[0] != 'RPAREN':
+                    self.expression()
+                    if self.current_token()[0] == 'COMMA':
+                        self.eat('COMMA')
+                self.eat('RPAREN')
             self.eat('SEMICOLON')
-        elif token_type == 'IDENTIFIER' and value == 'mostre':
-            self.eat('IDENTIFIER')  # 'mostre'
+        elif token_type == 'IF':
+            self.conditional()
+        elif token_type == 'WHILE':
+            self.loop()
+        elif token_type == 'RETURN':
+            self.return_statement()
+        elif token_type == 'SHOW':
+            self.eat('SHOW')
             self.eat('LPAREN')
             self.expression()
             self.eat('RPAREN')
@@ -89,22 +140,48 @@ class Syntax:
         else:
             raise SyntaxError(f"Comando inválido na linha {line_number}")
 
+    def conditional(self):
+        self.eat('IF')
+        self.expression()
+        self.eat('THEN')
+        self.statement()
+        if self.current_token() and self.current_token()[0] == 'ELSE':
+            self.eat('ELSE')
+            self.statement()
+
+    def loop(self):
+        self.eat('WHILE')
+        self.expression()
+        self.eat('DO')
+        self.actions()
+
+    def return_statement(self):
+        self.eat('RETURN')
+        if self.current_token() and self.current_token()[0] != 'SEMICOLON':
+            self.expression()
+        self.eat('SEMICOLON')
+
     def expression(self):
-        """Reconhece expressões matemáticas e booleanas."""
+        self.simple_expression()
+        while self.current_token() and self.current_token()[0] in ('EQUAL', 'NOT_EQUAL', 'GREATER', 'GREATER_EQUAL', 'LESS', 'LESS_EQUAL'):
+            self.eat(self.current_token()[0])
+            self.simple_expression()
+
+    def simple_expression(self):
+        if self.current_token() and self.current_token()[0] in ('PLUS', 'MINUS'):
+            self.eat(self.current_token()[0])
         self.term()
         while self.current_token() and self.current_token()[0] in ('PLUS', 'MINUS'):
-            self.eat(self.current_token()[0])  # '+' ou '-'
+            self.eat(self.current_token()[0])
             self.term()
 
     def term(self):
-        """Reconhece multiplicação, divisão e fatores."""
         self.factor()
-        while self.current_token() and self.current_token()[0] in ('MULTIPLY', 'DIVIDE'):
-            self.eat(self.current_token()[0])  # '*' ou '/'
+        while self.current_token() and self.current_token()[0] in ('MULTIPLY', 'DIVIDE', 'AND', 'OR'):
+            self.eat(self.current_token()[0])
             self.factor()
 
     def factor(self):
-        """Reconhece números, variáveis e valores booleanos."""
         token_type, value, line_number = self.current_token()
         if token_type == 'NUMBER':
             self.eat('NUMBER')
@@ -114,5 +191,35 @@ class Syntax:
             self.eat('LPAREN')
             self.expression()
             self.eat('RPAREN')
+        elif token_type in ('TRUE', 'FALSE'):
+            self.eat(token_type)
+        elif token_type == 'NOT':
+            self.eat('NOT')
+            self.factor()
         else:
             raise SyntaxError(f"Fator inválido na linha {line_number}")
+
+    def type_var(self):
+        token_type, value, line_number = self.current_token()
+
+        if self.current_token() and self.current_token()[0] == 'INT':
+            self.eat('INT')
+        elif self.current_token() and self.current_token()[0] == 'BOOL':
+            self.eat('BOOL')
+        else:
+            raise SyntaxError(f"esperava o tipo 'INT ou BOOL' na linha {line_number}")
+    def assignment(self):
+        token_type, value, line_number = self.current_token()
+        if self.current_token() and self.current_token()[0] == 'ASSIGN':
+            self.eat('ASSIGN')
+            if self.current_token() and self.current_token()[0] == 'NUMBER':
+                self.eat('NUMBER')
+                if self.current_token() and self.current_token()[0] == 'SEMICOLON':
+                    self.eat('SEMICOLON')
+                else:
+                    raise SyntaxError(f"esperava um semicolon na linha {line_number}")
+            else:
+                raise SyntaxError(f"esperava um number na linha {line_number}")
+
+        else:
+            raise SyntaxError(f"esperava um assign na linha {line_number}")

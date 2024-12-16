@@ -1,4 +1,11 @@
-funcao soma(int a, int b): int
+programa SOMA;
+
+funcao soma(a: int, b: int): int
 inicio
     retorna a + b;
 fim
+
+inicio
+    // Corpo principal do programa
+fim
+

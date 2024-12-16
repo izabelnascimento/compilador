@@ -1,4 +1,4 @@
-programa inicio
-    var int x;
+programa ini;
+    var x: int;
     x => 10;
 fim
