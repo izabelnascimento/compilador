@@ -32,7 +32,7 @@ class Util:
         os.makedirs(dir_path, exist_ok=True)
         with open(f'{dir_path}/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['Token', 'Lexema', 'Line'])
+            writer.writerow(['ID', 'TOKEN', 'NAME', 'LINE'])
             for token_id, token_type, token_value, token_line in tokens:
                 writer.writerow([token_id, token_type, token_value, token_line])
         print("Tokens salvos em 'tokens.csv'.")

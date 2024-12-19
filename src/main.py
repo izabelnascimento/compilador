@@ -5,8 +5,8 @@ def execute_one(folder, file_name):
     Compiler.compile(folder, file_name)
 
 
-def execute_all_folder(folder):
-    for i in range(1, 8):
+def execute_all_folder(folder, n):
+    for i in range(1, n):
         file_name = f'code{i}_1'
         Compiler.compile(folder, file_name)
         file_name = f'code{i}_2'
@@ -14,8 +14,8 @@ def execute_all_folder(folder):
 
 
 def execute_all():
-    execute_all_folder('test_lexer')
-    execute_all_folder('test_syntax')
+    execute_all_folder('test_lexer', 11)
+    execute_all_folder('test_syntax', 6)
 
 
 def main():
