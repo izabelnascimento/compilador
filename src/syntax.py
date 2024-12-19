@@ -27,21 +27,29 @@ class Syntax:
                 f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[3] if self.current_token() else 'desconhecida'}."
             )
 
-    def eat_var(self):
-        if self.current_token() and self.current_token()[1] == 'NUMBER':
-            self.current_token_index += 1
-        elif self.current_token() and self.current_token()[1] == 'TRUE':
-            self.current_token_index += 1
-        elif self.current_token() and self.current_token()[1] == 'FALSE':
-            self.current_token_index += 1
-        elif self.current_token() and self.current_token()[1] == 'IDENTIFIER':
-            self.expression()
-        else:
-            expected = 'BOOL, INT or expression value'
-            found = self.current_token()[1] if self.current_token() else "EOF"
-            raise SyntaxError(
-                f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[3] if self.current_token() else 'desconhecida'}."
-            )
+    # def eat_var(self):
+    #     if self.current_token() and self.current_token()[1] == 'NUMBER':
+    #         self.current_token_index += 1
+    #         self.eat('SEMICOLON')
+    #     elif self.current_token() and self.current_token()[1] == 'TRUE':
+    #         self.current_token_index += 1
+    #         self.eat('SEMICOLON')
+    #     elif self.current_token() and self.current_token()[1] == 'FALSE':
+    #         self.current_token_index += 1
+    #         self.eat('SEMICOLON')
+    #     elif self.current_token() and self.current_token()[1] == 'IDENTIFIER':
+    #         self.expression()
+    #         self.eat('SEMICOLON')
+    #     elif self.current_token() and self.current_token()[1] == 'CALL':
+    #         self.call()
+    #     elif self.current_token() and self.current_token()[1] == 'LPAREN':
+    #         self.expression()
+    #     else:
+    #         expected = 'BOOL, INT or expression value'
+    #         found = self.current_token()[1] if self.current_token() else "EOF"
+    #         raise SyntaxError(
+    #             f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[3] if self.current_token() else 'desconhecida'}."
+    #         )
 
     def parse(self):
         self.program()
@@ -52,11 +60,12 @@ class Syntax:
         self.eat('SEMICOLON')
         self.eat('BEGIN')
         self.body()
+        self.eat('END')
 
     def body(self):
         if self.current_token() and self.current_token()[1] == 'VAR':
             self.declaration()
-        elif self.current_token() and self.current_token()[1] in ('IF', 'ELSE'):
+        elif self.current_token() and self.current_token()[1] == 'IF':
             self.conditional()
         elif self.current_token() and self.current_token()[1] in ('PROCEDURE', 'FUNCTION'):
             self.subroutine()
@@ -66,8 +75,10 @@ class Syntax:
             self.assignment()
         elif self.current_token() and self.current_token()[1] in 'SHOW':
             self.show()
-        else:
-            self.eat('END')
+        elif self.current_token() and self.current_token()[1] in 'CALL':
+            self.call()
+            self.eat('SEMICOLON')
+            self.body()
 
     def declaration(self):
         self.eat('VAR')
@@ -81,16 +92,16 @@ class Syntax:
             else:
                 break
         self.eat('COLON')
-        self.type_var(tokens_id)
+        self.eat_type_var(tokens_id)
         self.eat('SEMICOLON')
         self.body()
 
     def subroutine(self):
-        """Reconhece procedimentos e funções."""
         if self.current_token()[1] == 'PROCEDURE':
             self.procedure_declaration()
         elif self.current_token()[1] == 'FUNCTION':
             self.function_declaration()
+        self.body()
 
     def procedure_declaration(self):
         self.eat('PROCEDURE')
@@ -103,7 +114,6 @@ class Syntax:
         self.eat('BEGIN')
         self.body()
         self.eat('END')
-        # self.body()
 
     def function_declaration(self):
         self.eat('FUNCTION')
@@ -113,39 +123,39 @@ class Syntax:
             self.parameters()
             self.eat('RPAREN')
         self.eat('RETURN')
-        self.eat('IDENTIFIER')
+        self.eat_type_var([self.current_token()[0]])
         self.eat('SEMICOLON')
+        self.eat('BEGIN')
         self.body()
+        self.eat('END')
 
     def parameters(self):
         while True:
             self.eat('IDENTIFIER')
             self.eat('COLON')
-            self.type_var([self.current_token()[0]])
+            self.eat_type_var([self.current_token()[0]])
             if self.current_token() and self.current_token()[1] == 'COMMA':
                 self.eat('COMMA')
             else:
                 break
 
-    def actions(self):
-        if self.current_token() and self.current_token()[1] == 'IDENTIFIER':
-            self.eat('IDENTIFIER')
-            self.assignment()
-        else:
-            self.eat('BEGIN')
-        while self.current_token() and self.current_token()[1] != 'END':
-            self.statement()
-        self.eat('END')
+    def arguments(self):
+        while True:
+            # self.eat('IDENTIFIER')
+            self.expression()
+            if self.current_token() and self.current_token()[1] == 'COMMA':
+                self.eat('COMMA')
+            else:
+                break
 
     def statement(self):
         token_id, token_type, value, line_number = self.current_token()
-
         if token_type == 'IDENTIFIER':
             self.eat('IDENTIFIER')
             if self.current_token()[1] == 'ASSIGN':
                 self.eat('ASSIGN')
                 self.expression()
-            elif self.current_token()[1] == 'LPAREN':  # Chamada de função ou procedimento
+            elif self.current_token()[1] == 'LPAREN':
                 self.eat('LPAREN')
                 while self.current_token() and self.current_token()[1] != 'RPAREN':
                     self.expression()
@@ -159,6 +169,8 @@ class Syntax:
             self.loop()
         elif token_type == 'RETURN':
             self.return_statement()
+        elif token_type == 'SHOW':
+            self.show()
         else:
             raise SyntaxError(f"Comando inválido na linha {line_number}")
 
@@ -171,13 +183,15 @@ class Syntax:
             self.eat('ELSE')
             self.statement()
         self.eat('END')
+        self.body()
 
     def loop(self):
         self.eat('WHILE')
         self.expression()
         self.eat('DO')
-        self.actions()
+        self.body()
         self.eat('END')
+        self.body()
 
     def return_statement(self):
         self.eat('RETURN')
@@ -201,7 +215,7 @@ class Syntax:
 
     def term(self):
         self.factor()
-        while self.current_token() and self.current_token()[1] in ('MULTIPLY', 'DIVIDE', 'AND', 'OR'):
+        while self.current_token() and self.current_token()[1] in ('MULTIPLY', 'DIVIDE', 'AND', 'OR', 'RESTO'):
             self.eat(self.current_token()[1])
             self.factor()
 
@@ -220,10 +234,12 @@ class Syntax:
         elif token_type == 'NOT':
             self.eat('NOT')
             self.factor()
+        elif token_type == 'CALL':
+            self.call()
         else:
             raise SyntaxError(f"Fator inválido na linha {line_number}")
 
-    def type_var(self, tokens_id):
+    def eat_type_var(self, tokens_id):
         token_id, token_type, value, line_number = self.current_token()
         if self.current_token() and self.current_token()[1] == 'INT':
             self.symbol_table = self.add_symbol_type(tokens_id, 'INT')
@@ -237,7 +253,7 @@ class Syntax:
     def assignment(self):
         self.eat('IDENTIFIER')
         self.eat('ASSIGN')
-        self.eat_var()
+        self.expression()
         self.eat('SEMICOLON')
         self.body()
 
@@ -265,3 +281,10 @@ class Syntax:
         self.eat('RPAREN')
         self.eat('SEMICOLON')
         self.body()
+
+    def call(self):
+        self.eat('CALL')
+        self.eat('IDENTIFIER')
+        self.eat('LPAREN')
+        self.arguments()
+        self.eat('RPAREN')

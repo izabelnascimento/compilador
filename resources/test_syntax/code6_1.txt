@@ -1,0 +1,23 @@
+programa ANALISE_COMPLEXA;
+
+inicio
+    // Verificando condição, printa 2 se é par e 1 se ímpar
+    condicao => chamar verificar_par(resultado);
+    se (condicao) entao
+        mostre(2);
+    senao
+        mostre(1);
+    fim
+
+    // Loop
+    enquanto (a > 0) faca
+        a => a - 1;
+        mostre(a);
+    fim
+
+    // Operações adicionais
+    resultado => (b * 2) + (a / 2) - 5;
+    mostre("Novo resultado:");
+    mostre(resultado);
+
+fim

@@ -6,6 +6,7 @@ inicio
             retorna 1;
         senao
             retorna n * chamar fatorial(n - 1);
+        fim
     fim
     mostre(chamar fatorial(5));
 fim
