@@ -7,10 +7,11 @@ class Syntax:
         self.symbol_table = symbol_table
         self.current_token_index = 0
 
-    def start_syntax(self):
+    def start_syntax(self, folder, file_name):
         print("\n------------------- ANÁLISE SINTÁTICA -------------------")
         self.parse()
         print("\nSymbol Table:", self.symbol_table)
+        Util.save_symbol_table_to_csv(self.symbol_table, f'{folder}/syntax', file_name)
         Util.print_sucess("\nAnálise sintática concluída sem erros.")
 
     def current_token(self):

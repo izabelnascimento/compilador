@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 
 
@@ -27,18 +28,22 @@ class Util:
 
     @staticmethod
     def save_tokens_to_csv(tokens, folder, file_name):
-        with open(f'../resources/out/{folder}/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
+        dir_path = f'../resources/out/{folder}'
+        os.makedirs(dir_path, exist_ok=True)
+        with open(f'{dir_path}/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['Token', 'Lexema', 'Line'])  # Cabeçalho
+            writer.writerow(['Token', 'Lexema', 'Line'])
             for token_id, token_type, token_value, token_line in tokens:
                 writer.writerow([token_id, token_type, token_value, token_line])
         print("Tokens salvos em 'tokens.csv'.")
 
     @staticmethod
     def save_symbol_table_to_csv(symbol_table, folder, file_name):
-        with open(f'../resources/out/{folder}/{file_name}_symbol_table.csv', 'w', newline='', encoding='utf-8') as file:
+        dir_path = f'../resources/out/{folder}'
+        os.makedirs(dir_path, exist_ok=True)
+        with open(f'{dir_path}/{file_name}_symbol_table.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['ID', 'Type', 'Line'])  # Cabeçalho
+            writer.writerow(['ID', 'Type', 'Line'])
             for symbol in symbol_table:
                 writer.writerow([symbol.token, symbol.name, symbol.line])
         print("Tabela de símbolos salva em 'symbol_table.csv'.")

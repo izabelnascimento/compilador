@@ -54,14 +54,14 @@ class Lexer:
             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*')
         ]
 
-    def start_lexer(self, code, file_name):
+    def start_lexer(self, code, folder, file_name):
         print("\n------------------- ANÁLISE LEXICA -------------------")
         tokens = list(self.tokenize(code))
         print("\nTokens:", tokens)
-        Util.save_tokens_to_csv(tokens, 'lexer', file_name)
+        Util.save_tokens_to_csv(tokens, f'{folder}/lexer', file_name)
         symbol_table = Symbol.symbol_table(tokens)
         print("\nSymbol Table:", symbol_table)
-        Util.save_symbol_table_to_csv(symbol_table, 'lexer', file_name)
+        Util.save_symbol_table_to_csv(symbol_table, f'{folder}/lexer', file_name)
         Util.print_sucess("Análise Léxica concluída sem erros")
         return tokens, symbol_table
 
