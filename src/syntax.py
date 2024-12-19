@@ -32,6 +32,7 @@ class Syntax:
 
     def program(self):
         self.eat('PROGRAM')
+        self.add_symbol_type([self.current_token()[0]], 'PROGRAM')
         self.eat('IDENTIFIER')
         self.eat('SEMICOLON')
         self.eat('BEGIN')
@@ -64,7 +65,7 @@ class Syntax:
         while True:
             current_token = self.current_token()
             tokens_id.append(current_token[0])
-            self.eat('IDENTIFIER')  # Nome da variável
+            self.eat('IDENTIFIER')
             if current_token and self.current_token()[1] == 'COMMA':
                 self.eat('COMMA')
             else:
@@ -83,6 +84,7 @@ class Syntax:
 
     def procedure_declaration(self):
         self.eat('PROCEDURE')
+        self.add_symbol_type([self.current_token()[0]], 'PROCEDURE')
         self.eat('IDENTIFIER')
         if self.current_token()[1] == 'LPAREN':
             self.eat('LPAREN')
@@ -95,6 +97,7 @@ class Syntax:
 
     def function_declaration(self):
         self.eat('FUNCTION')
+        self.add_symbol_type([self.current_token()[0]], 'FUNCTION')
         self.eat('IDENTIFIER')
         if self.current_token()[1] == 'LPAREN':
             self.eat('LPAREN')
@@ -109,9 +112,10 @@ class Syntax:
 
     def parameters(self):
         while True:
+            token_id = self.current_token()[0]
             self.eat('IDENTIFIER')
             self.eat('COLON')
-            self.eat_type_var([self.current_token()[0]])
+            self.eat_type_var([token_id])
             if self.current_token() and self.current_token()[1] == 'COMMA':
                 self.eat('COMMA')
             else:
@@ -227,10 +231,10 @@ class Syntax:
 
     def eat_type_var(self, tokens_id):
         token_id, token_type, value, line_number = self.current_token()
-        if self.current_token() and self.current_token()[1] == 'INT':
+        if self.current_token() and token_type == 'INT':
             self.symbol_table = self.add_symbol_type(tokens_id, 'INT')
             self.eat('INT')
-        elif self.current_token() and self.current_token()[1] == 'BOOL':
+        elif self.current_token() and token_type == 'BOOL':
             self.symbol_table = self.add_symbol_type(tokens_id, 'BOOL')
             self.eat('BOOL')
         else:
@@ -245,12 +249,10 @@ class Syntax:
 
     def add_symbol_type(self, tokens_id, symbol_type):
         new_table = []
-
         for symbol in self.symbol_table:
             if symbol.id in tokens_id:
                 symbol.kind = symbol_type
             new_table.append(symbol)
-
         self.symbol_table = new_table
         return new_table
 
