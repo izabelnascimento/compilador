@@ -1,11 +1,8 @@
 programa RETURN_FUNCAO;
-
-funcao soma (a: int, b: int) retorna int;
-
 inicio
-    retorna a + b;
-fim
-
-inicio
+    funcao soma (a: int, b: int) retorna int;
+    inicio
+        retorna a + b;
+    fim
     mostre(chamar soma(5, 3));
 fim

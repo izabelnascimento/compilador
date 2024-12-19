@@ -6,18 +6,18 @@ from src.util import Util
 class Compiler:
 
     @staticmethod
-    def compile(file_name):
-        code = Util.read_code_from_file(f'../resources/test_lexer/{file_name}')
+    def compile(folder, file_name):
+        code = Util.read_code_from_file(f'../resources/{folder}/{file_name}.txt')
         if not code:
             return
 
         print(f"\n-------------- Compilando arquivo {file_name} -------------- ")
         try:
             lexer = Lexer()
-            tokens = lexer.start_lexer(code, file_name)
+            tokens, symbol_table = lexer.start_lexer(code, folder, file_name)
             try:
-                syntax = Syntax(tokens)
-                syntax.start_syntax()
+                syntax = Syntax(tokens, symbol_table, None)
+                syntax.start_syntax(folder, file_name)
             except SyntaxError as e:
                 Util.print_error(f"\nErro durante a análise sintática: {e}")
         except SyntaxError as e:

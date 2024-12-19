@@ -1,15 +1,28 @@
 from src.compiler import Compiler
 
 
-def main():
-    file_name = f'code1_1.txt'
-    Compiler.compile(file_name)
+def execute_one(folder, file_name):
+    Compiler.compile(folder, file_name)
 
-    # for i in range(1, 11):
-    #     file_name = f'code{i}_1.txt'
-    #     Compiler.compile(file_name)
-    #     file_name = f'code{i}_2.txt'
-    #     Compiler.compile(file_name)
+
+def execute_all_folder(folder):
+    for i in range(1, 8):
+        file_name = f'code{i}_1'
+        Compiler.compile(folder, file_name)
+        file_name = f'code{i}_2'
+        Compiler.compile(folder, file_name)
+
+
+def execute_all():
+    execute_all_folder('test_lexer')
+    execute_all_folder('test_syntax')
+
+
+def main():
+    folder = 'test_syntax'
+    # execute_one(folder, f'code1_1')
+    # execute_all_folder(folder)
+    execute_all()
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ class Lexer:
             ('COMMENT', r'//.*'),
             ('BLOCK_COMMENT', r'/\*[\s\S]*?\*/'),
             ('DIVIDE', r'/'),
+            ('RESTO', r'%'),
             ('LPAREN', r'\('),
             ('RPAREN', r'\)'),
             ('SEMICOLON', r';'),
@@ -53,20 +54,24 @@ class Lexer:
             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*')
         ]
 
-    def start_lexer(self, code, file_name):
-        print("------------------- ANÁLISE LEXICA -------------------")
+    def start_lexer(self, code, folder, file_name):
+        print("\n------------------- ANÁLISE LEXICA -------------------")
         tokens = list(self.tokenize(code))
         print("\nTokens:", tokens)
-        Util.save_tokens_to_csv(tokens, 'lexer', file_name)
+        Util.save_tokens_to_csv(tokens, f'{folder}/lexer', file_name)
         symbol_table = Symbol.symbol_table(tokens)
         print("\nSymbol Table:", symbol_table)
-        Util.save_symbol_table_to_csv(symbol_table, 'lexer', file_name)
+        Util.save_symbol_table_to_csv(symbol_table, f'{folder}/lexer', file_name)
         Util.print_sucess("Análise Léxica concluída sem erros")
-        return tokens
+        return tokens, symbol_table
+
+    import re
 
     def tokenize(self, code):
         position = 0
         line_number = 1
+        token_id = 1  # Inicializa o ID do token
+
         while position < len(code):
             match = None
             for token_type, pattern in self.tokens:
@@ -78,8 +83,11 @@ class Lexer:
                     elif token_type in ('COMMENT', 'BLOCK_COMMENT'):
                         pass  # Ignorar comentários
                     else:
-                        yield token_type, match.group(0), line_number
+                        # Retorna a estrutura com o ID
+                        yield token_id, token_type, match.group(0), line_number
+                        token_id += 1  # Incrementa o ID
                     position = match.end()
                     break
             if not match:
                 raise SyntaxError(f"Unexpected character '{code[position]}' on line {line_number}")
+

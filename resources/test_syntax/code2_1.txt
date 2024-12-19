@@ -1,9 +1,7 @@
 programa SIMBOLOS;
-
-var x, y: int;
-var condicao: bool;
-
 inicio
+    var x, y: int;
+    var condicao: bool;
     x => 5;
     y => 10;
     condicao => verdadeiro;

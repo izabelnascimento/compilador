@@ -1,5 +1,8 @@
-programa RETURN_INVALIDO;
-
+programa RETURN_FUNCAO;
 inicio
-    retorna 5;  // return fora de uma função
+    funcao soma (a: int, b: int) retorna int;
+    inicio
+        retorna; //falta retorno
+    fim
+    mostre(chamar soma(5, 3));
 fim
