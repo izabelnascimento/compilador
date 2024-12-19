@@ -45,26 +45,29 @@ class Syntax:
         self.eat('END')
 
     def body(self):
-        token_type = self.current_token()[1]
-        if token_type:
+        token = self.current_token()
+        if token:
+            token_type = self.current_token()[1]
             if token_type == 'VAR':
                 self.declaration()
             elif token_type == 'IF':
                 self.conditional()
             elif token_type in ('PROCEDURE', 'FUNCTION'):
                 self.subroutine()
-            elif token_type in 'WHILE':
+            elif token_type == 'WHILE':
                 self.loop()
-            elif token_type in 'IDENTIFIER':
+            elif token_type == 'IDENTIFIER':
                 self.assignment()
-            elif token_type in 'SHOW':
+            elif token_type == 'SHOW':
                 self.show()
-            elif token_type in 'CALL':
+            elif token_type == 'CALL':
                 self.call()
                 self.eat('SEMICOLON')
                 self.body()
-            elif token_type in 'RETURN':
+            elif token_type == 'RETURN':
                 self.return_statement()
+            elif token_type == 'BREAK':
+                self.break_statement()
 
     def declaration(self):
         self.eat('VAR')
@@ -202,20 +205,18 @@ class Syntax:
 
     def return_statement(self):
         token = self.current_token()
-        if self.current_scope[1] != 'FUNCTION':
-            raise SyntaxError(f"RETURN deve estar dentro de uma FUNCTION, linha {token[3]}")
+        # if self.current_scope[1] != 'FUNCTION':
+        #     raise SyntaxError(f"RETURN deve estar dentro de uma FUNCTION, linha {token[3]}")
         self.eat('RETURN')
-        if self.current_token() and self.current_token()[1] != 'SEMICOLON':
+        if token and token[1] != 'SEMICOLON':
             self.expression()
         self.eat('SEMICOLON')
 
     def break_statement(self):
         token = self.current_token()
-        if self.current_scope[1] != 'LOOP':
-            raise SyntaxError(f"BREAK deve estar dentro de um LOOP, linha {token[3]}")
+        # if self.current_scope[1] != 'WHILE':
+        #     raise SyntaxError(f"BREAK deve estar dentro de um LOOP, linha {token[3]}")
         self.eat('BREAK')
-        if token and token[1] != 'SEMICOLON':
-            self.expression()
         self.eat('SEMICOLON')
 
     def expression(self):
@@ -256,6 +257,8 @@ class Syntax:
             self.factor()
         elif token_type == 'CALL':
             self.call()
+        elif token_type == 'BREAK':
+            self.break_statement()
         else:
             raise SyntaxError(f"Fator inválido na linha {line_number}")
 

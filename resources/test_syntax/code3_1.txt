@@ -1,14 +1,14 @@
 programa RECURSIVO;
 inicio
-    var hi: int;
-    hi => 3;
+    var fat: int;
     funcao fatorial (n: int) retorna int;
     inicio
         se (n == 0) entao
-            retorna 1;
+            fat => 1;
         senao
-            retorna n * chamar fatorial(n - 1);
+            fat => n * chamar fatorial(n - 1);
         fim
+        retorna fat;
     fim
     mostre(chamar fatorial(5));
     mostre(hi);

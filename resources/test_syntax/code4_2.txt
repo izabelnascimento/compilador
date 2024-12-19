@@ -1,7 +1,8 @@
-programa BREAK_INVALIDO;
+programa BREAK_WHILE;
 
 inicio
-    se (x == 5) entao
-        quebra;  // break fora de um while
+    enquanto (x < 10) faca
+        quebra;
+        x => x + 1;
     fim
 fim

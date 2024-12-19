@@ -1,14 +1,11 @@
 programa RECURSIVO;
-
-funcao fatorial (n: int) retorna int;
-
 inicio
-    se (n == 0) entao
-        retorna 1;
-    senao
-        retorna n * fatorial(n - 1);  // Falta a palavra "chamar"
-fim
-
-inicio
+    funcao fatorial (n: int) retorna int;
+    inicio
+        se (n == 0) entao
+            retorna 1;
+        senao
+            retorna n * fatorial(n - 1);  // Falta a palavra "chamar"
+    fim
     mostre(chamar fatorial(5));
 fim
