@@ -17,7 +17,6 @@ class Syntax:
         return self.tokens[self.current_token_index] if self.current_token_index < len(self.tokens) else None
 
     def eat(self, token_type):
-        """Avança para o próximo token se o tipo atual for igual ao esperado."""
         if self.current_token() and self.current_token()[1] == token_type:
             self.current_token_index += 1
         else:
@@ -26,30 +25,6 @@ class Syntax:
             raise SyntaxError(
                 f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[3] if self.current_token() else 'desconhecida'}."
             )
-
-    # def eat_var(self):
-    #     if self.current_token() and self.current_token()[1] == 'NUMBER':
-    #         self.current_token_index += 1
-    #         self.eat('SEMICOLON')
-    #     elif self.current_token() and self.current_token()[1] == 'TRUE':
-    #         self.current_token_index += 1
-    #         self.eat('SEMICOLON')
-    #     elif self.current_token() and self.current_token()[1] == 'FALSE':
-    #         self.current_token_index += 1
-    #         self.eat('SEMICOLON')
-    #     elif self.current_token() and self.current_token()[1] == 'IDENTIFIER':
-    #         self.expression()
-    #         self.eat('SEMICOLON')
-    #     elif self.current_token() and self.current_token()[1] == 'CALL':
-    #         self.call()
-    #     elif self.current_token() and self.current_token()[1] == 'LPAREN':
-    #         self.expression()
-    #     else:
-    #         expected = 'BOOL, INT or expression value'
-    #         found = self.current_token()[1] if self.current_token() else "EOF"
-    #         raise SyntaxError(
-    #             f"Esperado token '{expected}', mas encontrado '{found}' na linha {self.current_token()[3] if self.current_token() else 'desconhecida'}."
-    #         )
 
     def parse(self):
         self.program()
@@ -79,6 +54,8 @@ class Syntax:
             self.call()
             self.eat('SEMICOLON')
             self.body()
+        elif self.current_token() and self.current_token()[1] in 'RETURN':
+            self.return_statement()
 
     def declaration(self):
         self.eat('VAR')
@@ -169,6 +146,8 @@ class Syntax:
             self.loop()
         elif token_type == 'RETURN':
             self.return_statement()
+        elif token_type == 'BREAK':
+            self.break_statement()
         elif token_type == 'SHOW':
             self.show()
         else:
@@ -195,6 +174,12 @@ class Syntax:
 
     def return_statement(self):
         self.eat('RETURN')
+        if self.current_token() and self.current_token()[1] != 'SEMICOLON':
+            self.expression()
+        self.eat('SEMICOLON')
+
+    def break_statement(self):
+        self.eat('BREAK')
         if self.current_token() and self.current_token()[1] != 'SEMICOLON':
             self.expression()
         self.eat('SEMICOLON')

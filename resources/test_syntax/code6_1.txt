@@ -17,7 +17,6 @@ inicio
 
     // Operações adicionais
     resultado => (b * 2) + (a / 2) - 5;
-    mostre("Novo resultado:");
     mostre(resultado);
 
 fim
