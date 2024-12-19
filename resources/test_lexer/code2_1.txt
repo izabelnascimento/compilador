@@ -1,6 +1,6 @@
-programa inicio
+programa code2;
     se (x > 5) entao
-        mostre verdadeiro;
-    senao
-        mostre falso;
-fim
+        mostre(verdadeiro);
+    fim senao
+        mostre(falso);
+    fim

@@ -1,4 +1,3 @@
-programa inicio
+programa code3;
     faca x => x + 1;
     enquanto (x < 10);
-fim

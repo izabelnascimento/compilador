@@ -30,8 +30,8 @@ class Util:
         with open(f'../resources/out/{folder}/{file_name}_tokens.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(['Token', 'Lexema', 'Line'])  # Cabeçalho
-            for token_type, token_value, token_line in tokens:
-                writer.writerow([token_type, token_value, token_line])
+            for token_id, token_type, token_value, token_line in tokens:
+                writer.writerow([token_id, token_type, token_value, token_line])
         print("Tokens salvos em 'tokens.csv'.")
 
     @staticmethod
@@ -40,5 +40,5 @@ class Util:
             writer = csv.writer(file)
             writer.writerow(['ID', 'Type', 'Line'])  # Cabeçalho
             for symbol in symbol_table:
-                writer.writerow([symbol.id, symbol.kind, symbol.line])
+                writer.writerow([symbol.token, symbol.name, symbol.line])
         print("Tabela de símbolos salva em 'symbol_table.csv'.")
