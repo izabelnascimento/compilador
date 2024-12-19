@@ -1,0 +1,49 @@
+programa ANALISE_COMPLEXA_BREAK;
+
+inicio
+
+    var a, b, resultado: int;
+    var condicao: bool;
+
+    procedimento calcular_soma(x: int, y: int);
+    inicio
+        resultado => x + y;
+        mostre(resultado);
+    fim
+
+    funcao verificar_par(valor: int) retorna bool;
+    inicio
+        se (valor % 2 == 0) entao
+            quebra;
+            retorna verdadeiro;
+        senao
+            retorna falso;
+        fim
+    fim
+
+    // Inicializando variáveis
+    a => 10;
+    b => 15;
+
+    // Chamando procedimento
+    chamar calcular_soma(a, b);
+
+    // Verificando condição, printa 2 se é par e 1 se ímpar
+    condicao => chamar verificar_par(resultado);
+    se (condicao) entao
+        mostre(2);
+    senao
+        mostre(1);
+    fim
+
+    // Loop
+    enquanto (a > 0) faca
+        a => a - 1;
+        mostre(a);
+    fim
+
+    // Operações adicionais
+    resultado => (b * 2) + (a / 2) - 5;
+    mostre(resultado);
+
+fim

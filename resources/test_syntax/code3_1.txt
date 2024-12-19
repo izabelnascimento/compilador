@@ -1,5 +1,7 @@
 programa RECURSIVO;
 inicio
+    var hi: int;
+    hi => 3;
     funcao fatorial (n: int) retorna int;
     inicio
         se (n == 0) entao
@@ -9,4 +11,5 @@ inicio
         fim
     fim
     mostre(chamar fatorial(5));
+    mostre(hi);
 fim

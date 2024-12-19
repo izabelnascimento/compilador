@@ -2,10 +2,11 @@ from src.util import Util
 
 
 class Syntax:
-    def __init__(self, tokens, symbol_table):
+    def __init__(self, tokens, symbol_table, current_scope):
         self.tokens = tokens
         self.symbol_table = symbol_table
         self.current_token_index = 0
+        self.current_scope = current_scope
 
     def start_syntax(self, folder, file_name):
         print("\n------------------- ANÁLISE SINTÁTICA -------------------")
@@ -32,7 +33,11 @@ class Syntax:
 
     def program(self):
         self.eat('PROGRAM')
-        self.add_symbol_type([self.current_token()[0]], 'PROGRAM')
+        token = self.current_token()
+        self.add_symbol_type([token[0]], 'PROGRAM')
+        self.current_scope = token
+        self.add_scope([token[0]])
+        self.add_scope([self.current_token()[0]])
         self.eat('IDENTIFIER')
         self.eat('SEMICOLON')
         self.eat('BEGIN')
@@ -40,24 +45,26 @@ class Syntax:
         self.eat('END')
 
     def body(self):
-        if self.current_token() and self.current_token()[1] == 'VAR':
-            self.declaration()
-        elif self.current_token() and self.current_token()[1] == 'IF':
-            self.conditional()
-        elif self.current_token() and self.current_token()[1] in ('PROCEDURE', 'FUNCTION'):
-            self.subroutine()
-        elif self.current_token() and self.current_token()[1] in 'WHILE':
-            self.loop()
-        elif self.current_token() and self.current_token()[1] in 'IDENTIFIER':
-            self.assignment()
-        elif self.current_token() and self.current_token()[1] in 'SHOW':
-            self.show()
-        elif self.current_token() and self.current_token()[1] in 'CALL':
-            self.call()
-            self.eat('SEMICOLON')
-            self.body()
-        elif self.current_token() and self.current_token()[1] in 'RETURN':
-            self.return_statement()
+        token_type = self.current_token()[1]
+        if token_type:
+            if token_type == 'VAR':
+                self.declaration()
+            elif token_type == 'IF':
+                self.conditional()
+            elif token_type in ('PROCEDURE', 'FUNCTION'):
+                self.subroutine()
+            elif token_type in 'WHILE':
+                self.loop()
+            elif token_type in 'IDENTIFIER':
+                self.assignment()
+            elif token_type in 'SHOW':
+                self.show()
+            elif token_type in 'CALL':
+                self.call()
+                self.eat('SEMICOLON')
+                self.body()
+            elif token_type in 'RETURN':
+                self.return_statement()
 
     def declaration(self):
         self.eat('VAR')
@@ -65,6 +72,7 @@ class Syntax:
         while True:
             current_token = self.current_token()
             tokens_id.append(current_token[0])
+            self.add_scope([current_token[0]])
             self.eat('IDENTIFIER')
             if current_token and self.current_token()[1] == 'COMMA':
                 self.eat('COMMA')
@@ -85,6 +93,9 @@ class Syntax:
     def procedure_declaration(self):
         self.eat('PROCEDURE')
         self.add_symbol_type([self.current_token()[0]], 'PROCEDURE')
+        self.add_scope([self.current_token()[0]])
+        before_scope = self.current_scope
+        self.update_scope()
         self.eat('IDENTIFIER')
         if self.current_token()[1] == 'LPAREN':
             self.eat('LPAREN')
@@ -94,10 +105,14 @@ class Syntax:
         self.eat('BEGIN')
         self.body()
         self.eat('END')
+        self.return_scope(before_scope)
 
     def function_declaration(self):
         self.eat('FUNCTION')
         self.add_symbol_type([self.current_token()[0]], 'FUNCTION')
+        self.add_scope([self.current_token()[0]])
+        before_scope = self.current_scope
+        self.update_scope()
         self.eat('IDENTIFIER')
         if self.current_token()[1] == 'LPAREN':
             self.eat('LPAREN')
@@ -109,10 +124,12 @@ class Syntax:
         self.eat('BEGIN')
         self.body()
         self.eat('END')
+        self.return_scope(before_scope)
 
     def parameters(self):
         while True:
             token_id = self.current_token()[0]
+            self.add_scope([self.current_token()[0]])
             self.eat('IDENTIFIER')
             self.eat('COLON')
             self.eat_type_var([token_id])
@@ -123,7 +140,6 @@ class Syntax:
 
     def arguments(self):
         while True:
-            # self.eat('IDENTIFIER')
             self.expression()
             if self.current_token() and self.current_token()[1] == 'COMMA':
                 self.eat('COMMA')
@@ -133,6 +149,7 @@ class Syntax:
     def statement(self):
         token_id, token_type, value, line_number = self.current_token()
         if token_type == 'IDENTIFIER':
+            self.add_scope([self.current_token()[0]])
             self.eat('IDENTIFIER')
             if self.current_token()[1] == 'ASSIGN':
                 self.eat('ASSIGN')
@@ -159,6 +176,8 @@ class Syntax:
             raise SyntaxError(f"Comando inválido na linha {line_number}")
 
     def conditional(self):
+        before_scope = self.current_scope
+        self.update_scope()
         self.eat('IF')
         self.expression()
         self.eat('THEN')
@@ -167,25 +186,35 @@ class Syntax:
             self.eat('ELSE')
             self.statement()
         self.eat('END')
+        self.return_scope(before_scope)
         self.body()
 
     def loop(self):
+        before_scope = self.current_scope
+        self.update_scope()
         self.eat('WHILE')
         self.expression()
         self.eat('DO')
         self.body()
         self.eat('END')
+        self.return_scope(before_scope)
         self.body()
 
     def return_statement(self):
+        token = self.current_token()
+        if self.current_scope[1] != 'FUNCTION':
+            raise SyntaxError(f"RETURN deve estar dentro de uma FUNCTION, linha {token[3]}")
         self.eat('RETURN')
         if self.current_token() and self.current_token()[1] != 'SEMICOLON':
             self.expression()
         self.eat('SEMICOLON')
 
     def break_statement(self):
+        token = self.current_token()
+        if self.current_scope[1] != 'LOOP':
+            raise SyntaxError(f"BREAK deve estar dentro de um LOOP, linha {token[3]}")
         self.eat('BREAK')
-        if self.current_token() and self.current_token()[1] != 'SEMICOLON':
+        if token and token[1] != 'SEMICOLON':
             self.expression()
         self.eat('SEMICOLON')
 
@@ -214,6 +243,7 @@ class Syntax:
         if token_type == 'NUMBER':
             self.eat('NUMBER')
         elif token_type == 'IDENTIFIER':
+            self.add_scope([self.current_token()[0]])
             self.eat('IDENTIFIER')
         elif token_type == 'LPAREN':
             self.eat('LPAREN')
@@ -241,11 +271,28 @@ class Syntax:
             raise SyntaxError(f"esperava o tipo 'INT ou BOOL' na linha {line_number}")
 
     def assignment(self):
+        self.add_scope([self.current_token()[0]])
         self.eat('IDENTIFIER')
         self.eat('ASSIGN')
         self.expression()
         self.eat('SEMICOLON')
         self.body()
+
+    def show(self):
+        self.eat('SHOW')
+        self.eat('LPAREN')
+        self.expression()
+        self.eat('RPAREN')
+        self.eat('SEMICOLON')
+        self.body()
+
+    def call(self):
+        self.eat('CALL')
+        self.add_scope([self.current_token()[0]])
+        self.eat('IDENTIFIER')
+        self.eat('LPAREN')
+        self.arguments()
+        self.eat('RPAREN')
 
     def add_symbol_type(self, tokens_id, symbol_type):
         new_table = []
@@ -262,17 +309,19 @@ class Syntax:
                 return symbol
         return None
 
-    def show(self):
-        self.eat('SHOW')
-        self.eat('LPAREN')
-        self.expression()
-        self.eat('RPAREN')
-        self.eat('SEMICOLON')
-        self.body()
+    def add_scope(self, tokens_id):
+        new_table = []
+        for symbol in self.symbol_table:
+            if symbol.id in tokens_id:
+                symbol.scope_id = self.current_scope[0]
+                symbol.scope_token = self.current_scope[1]
+                symbol.scope_name = self.current_scope[2]
+            new_table.append(symbol)
+        self.symbol_table = new_table
+        return new_table
 
-    def call(self):
-        self.eat('CALL')
-        self.eat('IDENTIFIER')
-        self.eat('LPAREN')
-        self.arguments()
-        self.eat('RPAREN')
+    def update_scope(self):
+        self.current_scope = self.current_token()
+
+    def return_scope(self, before_scope):
+        self.current_scope = before_scope

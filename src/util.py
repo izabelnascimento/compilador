@@ -43,7 +43,16 @@ class Util:
         os.makedirs(dir_path, exist_ok=True)
         with open(f'{dir_path}/{file_name}_symbol_table.csv', 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['ID', 'Type', 'Line'])
+            writer.writerow(['ID', 'NAME', 'TOKEN', 'TPYE', 'LINE', 'SCOPE_NAME', 'SCOPE_TOKEN', 'SCOPE_ID'])
             for symbol in symbol_table:
-                writer.writerow([symbol.token, symbol.name, symbol.line])
+                writer.writerow([
+                    symbol.id,
+                    symbol.name,
+                    symbol.token,
+                    symbol.kind,
+                    symbol.line,
+                    symbol.scope_name,
+                    symbol.scope_token,
+                    symbol.scope_id
+                ])
         print("Tabela de símbolos salva em 'symbol_table.csv'.")

@@ -16,7 +16,7 @@ class Compiler:
             lexer = Lexer()
             tokens, symbol_table = lexer.start_lexer(code, folder, file_name)
             try:
-                syntax = Syntax(tokens, symbol_table)
+                syntax = Syntax(tokens, symbol_table, None)
                 syntax.start_syntax(folder, file_name)
             except SyntaxError as e:
                 Util.print_error(f"\nErro durante a análise sintática: {e}")
