@@ -20,7 +20,7 @@ class Compiler:
                 syntax = Syntax(tokens, symbol_table, None)
                 syntax.start_syntax(folder, file_name)
                 try:
-                    semantic = Semantic(symbol_table, folder, file_name)
+                    semantic = Semantic(tokens, symbol_table, folder, file_name)
                     semantic.start_semantic()
                 except SyntaxError as e:
                     Util.print_error(f"\nErro durante a análise semântica: {e}")

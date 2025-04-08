@@ -65,8 +65,6 @@ class Lexer:
         Util.print_sucess("Análise Léxica concluída sem erros")
         return tokens, symbol_table
 
-    import re
-
     def tokenize(self, code):
         position = 0
         line_number = 1

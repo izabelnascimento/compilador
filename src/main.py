@@ -21,8 +21,8 @@ def execute_all():
 
 def main():
     folder = 'test_semantic'
-    execute_one(folder, f'code1_2')
-    # execute_all_folder(folder, 2)
+    # execute_one(folder, f'code2_1')
+    execute_all_folder(folder, 3)
     # execute_all()
 
 

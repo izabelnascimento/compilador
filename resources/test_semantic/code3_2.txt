@@ -1,0 +1,6 @@
+programa exemplo;
+
+inicio
+    var x: int;
+    x => falso;
+fim
