@@ -11,7 +11,6 @@ class Semantic:
     def start_semantic(self):
         print("\n------------------- ANÁLISE SEMÂNTICA -------------------")
         self.check_declarations()
-        self.check_assignments()
         self.check_expression_types()
         self.check_function_calls()
         self.check_function_returns()
@@ -32,30 +31,6 @@ class Semantic:
                     f"[Erro] Identificador '{symbol.name}' usado na linha {symbol.line} mas não declarado."
                 )
 
-    # Verifica se o lado esquerdo da atribuição existe e tem tipo compatível com o lado direito.
-    def check_assignments(self):
-        print("\n- Verificando atribuições -")
-        assignments = [s for s in self.symbol_table if s.kind == 'assignment']
-
-        for assign in assignments:
-            target_name = assign.name
-            scope = assign.scope_name
-            expr_type = assign.token  # usando token para tipo da expressão atribuída, se for o caso
-
-            declared = False
-            declared_type = None
-
-            for s in self.symbol_table:
-                if s.name == target_name and s.kind == 'variable' and (s.scope_name == scope or s.scope_name == 'global'):
-                    declared = True
-                    declared_type = s.token  # usando token como tipo da variável
-                    break
-
-            if not declared:
-                Util.print_error(f"Variável '{target_name}' usada em atribuição não foi declarada no escopo '{scope}'.")
-            elif declared_type != expr_type:
-                Util.print_error(f"Tipo incompatível na atribuição à variável '{target_name}' no escopo '{scope}': esperado '{declared_type}', encontrado '{expr_type}'.")
-
     # Confirma se os operandos têm tipos compatíveis nas expressões.
     def check_expression_types(self):
         print("\n- Verificando tipos em expressões -")
@@ -66,7 +41,22 @@ class Semantic:
 
     # Confere se as chamadas usam o número e tipo corretos de argumentos.
     def check_function_calls(self):
-        print("\n- Verificando chamadas de funlções -")
+        print("\n- Verificando chamadas de funções -")
+        for symbol in self.symbol_table:
+            if symbol.kind in ('FUNCTION', 'PROCEDURE'):
+                for token in self.tokens:
+                    index = 0
+                    if token[0] == symbol.id and token[1] in ('FUNCTION', 'PROCEDURE'):
+                        args = list()
+                        index += 4
+                        for i in range(index, len(self.tokens)):
+                            if self.tokens[i][1] == 'INT':
+                                args.append('INT')
+                            elif self.tokens[i][1] == 'BOOL':
+                                args.append('BOOL')
+                            elif self.tokens[i][1] == 'SEMICOLON':
+                                break
+                        self.check_calls(args)
 
     # Verifica se existe return com tipo compatível nas funções.
     def check_function_returns(self):
@@ -150,7 +140,7 @@ class Semantic:
             if symbol.id == token[0]:
                 # A partir desse ponto, procura por um token 'RETURN'
                 for i in range(index, len(self.tokens)):
-                    if self.tokens[i][1] == 'RETURN':
+                    if self.tokens[i][1] == token_name:
                         return self.tokens[i+1]
                 break  # Se não encontrar 'RETURN' após o símbolo, encerra
         return None  # Caso não encontre o símbolo ou o RETURN
@@ -161,3 +151,28 @@ class Semantic:
             index += 1
             if symbol.id == token[0] and self.tokens[index][1] == token_name:
                 return index
+
+    # check_function_calls
+    def check_calls(self, args_defined):
+        index = 0
+        for token in self.tokens:
+            if token[1] == 'CALL':
+                index += 2
+                self.get_arguments(index, args_defined, token[3])
+            index += 1
+
+    def get_arguments(self, index, args_defined, line):
+        args = list()
+        for i in range(index, len(self.tokens)):
+            token = self.tokens[index]
+            if token[1] == 'NUMBER':
+                args.append('INT')
+            elif token[1] == 'BOOL':
+                args.append('BOOL')
+            elif token[1] == 'RPAREN':
+                break
+            index += 1
+        if args_defined != args:
+            raise SyntaxError(
+                f"[Erro] Argumentos inválidos na linha {line}. "
+            )

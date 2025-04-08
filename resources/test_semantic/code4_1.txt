@@ -1,0 +1,20 @@
+programa ANALISE_COMPLEXA;
+
+inicio
+
+    var a, b, resultado: int;
+    var condicao: bool;
+
+    funcao verificar_par(valor: int) retorna bool;
+    inicio
+        se (valor % 2 == 0) entao
+            retorna verdadeiro;
+        senao
+            retorna falso;
+        fim
+    fim
+
+    condicao => chamar verificar_par(1);
+    mostre(2);
+
+fim
