@@ -1,24 +1,29 @@
-# check_declarations
-x = 10;  // Erro: 'x' não foi declarado antes do uso
+programa exemplo;
+inicio
+    x => 10;  // Erro semântico: 'x' não declarado
 
-# check_assignments
-int a;
-a = true;  // Erro: tipo incompatível, esperado int, encontrado boolean
+   var a: int;
+    a => verdadeiro;  // Erro semântico: tipo incompatível
 
-# check_expression_types
-int b = 5 + false;  // Erro: operação inválida entre int e boolean
+    var b: int;
+    b => 5 + falso;  // Erro semântico: tipos incompatíveis na expressão
 
-# check_function_calls
-void soma(int x, int y);
-soma(1);  // Erro: número incorreto de argumentos
+    funcao soma(x: int, y: int) retorna int;
+    inicio
+        retorna x + y;
+    fim
 
-# check_function_returns
-int calcula() {
-    return true;  // Erro: tipo de retorno incompatível, esperado int
-}
+    var resultado: int;
+    resultado => chamar soma(5);  // Erro semântico: número incorreto de argumentos
 
-# check_control_flow_conditions
-int x = 5;
-if (x) {  // Erro: expressão condicional deve ser do tipo boolean
-    // ...
-}
+    funcao retorna_bool(dummy: int) retorna int;
+    inicio
+        retorna falso;  // Erro semântico: tipo de retorno incompatível
+    fim
+
+    var cond: int;
+    cond => 1;
+    se cond entao
+    mostre (cond);  // Substitui string literal por variável;
+    fim
+fim

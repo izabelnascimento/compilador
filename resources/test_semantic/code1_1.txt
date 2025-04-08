@@ -2,29 +2,30 @@ programa exemplo;
 
 inicio
     var x: int;
-    x := 10;
+    x => 10;
 
     var a: bool;
-    a := verdadeiro;
+    a => verdadeiro;
 
     var b: int;
-    b := 5 + 3;
+    b => 5 + 3;
 
-    funcao soma(x: int, y: int): int
+    funcao soma(x: int, y: int) retorna int;
     inicio
         retorna x + y;
     fim
 
     var resultado: int;
-    resultado := chamar soma(5, 2);
+    resultado => chamar soma(5, 2);
 
-    funcao retornar_int(): int
+    funcao retornar_int(dummy: int) retorna int;
     inicio
         retorna 42;
     fim
 
-    var cond: bool := verdadeiro;
+    var cond: bool;
+    cond => verdadeiro;
     se (cond) entao
-        mostre "Tudo certo!";
+        mostre (1);
     fim
 fim
