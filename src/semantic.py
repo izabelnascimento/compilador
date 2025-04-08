@@ -13,8 +13,6 @@ class Semantic:
         self.check_declarations()
         self.check_expression_types()
         self.check_function_calls()
-        self.check_function_returns()
-        self.check_control_flow_conditions()
         Util.save_symbol_table_to_csv(self.symbol_table, f'{self.folder}/semantic', self.file_name)
         Util.print_sucess("\nAnálise semântica concluída sem erros.")
 
@@ -31,42 +29,6 @@ class Semantic:
                     f"[Erro] Identificador '{symbol.name}' usado na linha {symbol.line} mas não declarado."
                 )
 
-    # Confirma se os operandos têm tipos compatíveis nas expressões.
-    def check_expression_types(self):
-        print("\n- Verificando tipos em expressões -")
-        for symbol in self.symbol_table:
-            next_token_index = self.find_next_token(symbol, 'ASSIGN')
-            if next_token_index:
-                self.check_expression(symbol.kind, next_token_index + 1)
-
-    # Confere se as chamadas usam o número e tipo corretos de argumentos.
-    def check_function_calls(self):
-        print("\n- Verificando chamadas de funções -")
-        for symbol in self.symbol_table:
-            if symbol.kind in ('FUNCTION', 'PROCEDURE'):
-                for token in self.tokens:
-                    index = 0
-                    if token[0] == symbol.id and token[1] in ('FUNCTION', 'PROCEDURE'):
-                        args = list()
-                        index += 4
-                        for i in range(index, len(self.tokens)):
-                            if self.tokens[i][1] == 'INT':
-                                args.append('INT')
-                            elif self.tokens[i][1] == 'BOOL':
-                                args.append('BOOL')
-                            elif self.tokens[i][1] == 'SEMICOLON':
-                                break
-                        self.check_calls(args)
-
-    # Verifica se existe return com tipo compatível nas funções.
-    def check_function_returns(self):
-        print("\n- Verificando compatibilidade do returns -")
-
-   # Garante que as expressões condicionais em if e while são do tipo booleano.
-    def check_control_flow_conditions(self):
-        print("\n- Verificando instrução de controle de fluxo -")
-
-    # check_declarations
     def contains(self, symbol, declared_symbols):
         for declared in declared_symbols:
             if declared.name == symbol.name and (
@@ -91,7 +53,14 @@ class Semantic:
                 break
         Util.save_symbol_table_to_csv(self.symbol_table, f'{self.folder}/semantic', self.file_name)
 
-    # check_expression_types
+    # Confirma se os operandos têm tipos compatíveis nas expressões.
+    def check_expression_types(self):
+        print("\n- Verificando tipos em expressões -")
+        for symbol in self.symbol_table:
+            next_token_index = self.find_next_token(symbol, 'ASSIGN')
+            if next_token_index:
+                self.check_expression(symbol.kind, next_token_index + 1)
+
     def check_expression(self, expected_kind, index):
         while self.tokens[index][1] != 'SEMICOLON':
             token_id, token_type, token_value, line_number = self.tokens[index]
@@ -152,7 +121,25 @@ class Semantic:
             if symbol.id == token[0] and self.tokens[index][1] == token_name:
                 return index
 
-    # check_function_calls
+    # Confere se as chamadas usam o número e tipo corretos de argumentos.
+    def check_function_calls(self):
+        print("\n- Verificando chamadas de funções -")
+        for symbol in self.symbol_table:
+            if symbol.kind in ('FUNCTION', 'PROCEDURE'):
+                for token in self.tokens:
+                    index = 0
+                    if token[0] == symbol.id and token[1] in ('FUNCTION', 'PROCEDURE'):
+                        args = list()
+                        index += 4
+                        for i in range(index, len(self.tokens)):
+                            if self.tokens[i][1] == 'INT':
+                                args.append('INT')
+                            elif self.tokens[i][1] == 'BOOL':
+                                args.append('BOOL')
+                            elif self.tokens[i][1] == 'SEMICOLON':
+                                break
+                        self.check_calls(args)
+
     def check_calls(self, args_defined):
         index = 0
         for token in self.tokens:
