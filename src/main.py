@@ -16,7 +16,7 @@ def execute_all_folder(folder, n):
 def execute_all():
     execute_all_folder('test_lexer', 11)
     execute_all_folder('test_syntax', 6)
-    execute_all_folder('test_semantic', 1)
+    execute_all_folder('test_semantic', 2)
 
 
 def main():

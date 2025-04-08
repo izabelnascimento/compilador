@@ -20,6 +20,8 @@ inicio
         fim
     fim
 
+    a => valor;
+
     // Inicializando variáveis
     a => 10;
     b => 15;
