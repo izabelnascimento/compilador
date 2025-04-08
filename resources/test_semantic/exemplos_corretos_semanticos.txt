@@ -1,0 +1,24 @@
+# check_declarations
+int x = 10;  // Correto: 'x' declarado antes do uso
+
+# check_assignments
+int a;
+a = 42;  // Correto: tipo compatível com a variável
+
+# check_expression_types
+int b = 5 + 3;  // Correto: operação entre dois inteiros
+
+# check_function_calls
+void soma(int x, int y);
+soma(1, 2);  // Correto: número e tipo de argumentos está correto
+
+# check_function_returns
+int calcula() {
+    return 100;  // Correto: tipo de retorno compatível
+}
+
+# check_control_flow_conditions
+bool condicao = true;
+if (condicao) {  // Correto: expressão condicional booleana
+    // ...
+}
