@@ -1,0 +1,24 @@
+# check_declarations
+x = 10;  // Erro: 'x' não foi declarado antes do uso
+
+# check_assignments
+int a;
+a = true;  // Erro: tipo incompatível, esperado int, encontrado boolean
+
+# check_expression_types
+int b = 5 + false;  // Erro: operação inválida entre int e boolean
+
+# check_function_calls
+void soma(int x, int y);
+soma(1);  // Erro: número incorreto de argumentos
+
+# check_function_returns
+int calcula() {
+    return true;  // Erro: tipo de retorno incompatível, esperado int
+}
+
+# check_control_flow_conditions
+int x = 5;
+if (x) {  // Erro: expressão condicional deve ser do tipo boolean
+    // ...
+}
