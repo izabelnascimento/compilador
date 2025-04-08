@@ -1,4 +1,5 @@
 from src.lexer import Lexer
+from src.semantic import Semantic
 from src.syntax import Syntax
 from src.util import Util
 
@@ -18,6 +19,11 @@ class Compiler:
             try:
                 syntax = Syntax(tokens, symbol_table, None)
                 syntax.start_syntax(folder, file_name)
+                try:
+                    semantic = Semantic(symbol_table)
+                    semantic.start_semantic()
+                except SyntaxError as e:
+                    Util.print_error(f"\nErro durante a análise semântica: {e}")
             except SyntaxError as e:
                 Util.print_error(f"\nErro durante a análise sintática: {e}")
         except SyntaxError as e:

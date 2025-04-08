@@ -20,9 +20,9 @@ def execute_all():
 
 def main():
     folder = 'test_syntax'
-    # execute_one(folder, f'code1_1')
+    execute_one(folder, f'code1_1')
     # execute_all_folder(folder)
-    execute_all()
+    # execute_all()
 
 
 if __name__ == "__main__":

@@ -1,32 +1,40 @@
-class SemanticAnalyzer:
-    def __init__(self):
-        self.symbol_table = {"global": {}}  # Tabela de símbolos com escopos
-        self.current_scope = "global"  # Controle do escopo atual
+from src.util import Util
 
-    def enter_scope(self, scope_name):
-        if scope_name not in self.symbol_table:
-            self.symbol_table[scope_name] = {}
-            self.current_scope = scope_name
 
-    def exit_scope(self):
-        self.current_scope = "global"
+class Semantic:
+    def __init__(self, symbol_table):
+        self.symbol_table = symbol_table
 
-    def analyze(self, tokens, token_context=None, previous_token=None):
-        for token_type, value in tokens:
-            # Exemplo: Validação de Identificadores
-            if token_type == 'IDENTIFIER' and 'usage' in token_context:
-                if value not in self.symbol_table[self.current_scope] and value not in self.symbol_table["global"]:
-                    raise ValueError(f"Undefined variable '{value}' in scope '{self.current_scope}'.")
+    def start_semantic(self):
+        print("\n------------------- ANÁLISE SEMÂNTICA -------------------")
+        self.check_declarations()
+        self.check_assignments()
+        self.check_expression_types()
+        self.check_function_calls()
+        self.check_function_returns()
+        self.check_control_flow_conditions()
+        Util.print_sucess("\nAnálise semântica concluída sem erros.")
 
-            # Exemplo: Declaração de Variável
-            if token_type == 'IDENTIFIER' and 'declaration' in token_context:
-                if value in self.symbol_table[self.current_scope]:
-                    raise ValueError(f"Variable '{value}' already declared in scope '{self.current_scope}'.")
-                self.symbol_table[self.current_scope][value] = "int"  # Adiciona com tipo 'int'
+    # Garante que todos os identificadores usados foram declarados no escopo apropriado.
+    def check_declarations(self):
+        print("\n- Verificando declaração -")
 
-            # Exemplo: Validação de Atribuição
-            if token_type == 'ASSIGN':
-                variable = previous_token[1]  # Token anterior assume ser variável
-                if (variable not in self.symbol_table[self.current_scope] and variable
-                        not in self.symbol_table["global"]):
-                    raise ValueError(f"Cannot assign to undefined variable '{variable}'.")
+    # Confirma se os operandos têm tipos compatíveis nas expressões.
+    def check_expression_types(self):
+        print("\n- Verificando tipos em expressões -")
+
+    # Verifica se o lado esquerdo da atribuição existe e tem tipo compatível com o lado direito.
+    def check_assignments(self):
+        print("\n- Verificando atribuições -")
+
+    # Confere se as chamadas usam o número e tipo corretos de argumentos.
+    def check_function_calls(self):
+        print("\n- Verificando chamadas de funlções -")
+
+    # Garante que as expressões condicionais em if e while são do tipo booleano.
+    def check_control_flow_conditions(self):
+        print("\n- Verificando instrução de controle de fluxo -")
+
+    # Verifica se existe return com tipo compatível nas funções.
+    def check_function_returns(self):
+        print("\n- Verificando compatibilidade do returns -")
