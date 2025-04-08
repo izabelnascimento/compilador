@@ -18,6 +18,15 @@ class Semantic:
     # Garante que todos os identificadores usados foram declarados no escopo apropriado.
     def check_declarations(self):
         print("\n- Verificando declaração -")
+        declared_ids = set()
+
+        for symbol in self.symbol_table:
+            if symbol.kind is not '':
+                declared_ids.add(symbol.name)
+            elif not declared_ids.__contains__(symbol.name):
+                raise SyntaxError(
+                    f"[Erro] Identificador '{symbol.name}' usado na linha {symbol.line} mas não declarado."
+                )
 
     # Verifica se o lado esquerdo da atribuição existe e tem tipo compatível com o lado direito.
     def check_assignments(self):

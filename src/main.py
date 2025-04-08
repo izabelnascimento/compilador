@@ -16,12 +16,13 @@ def execute_all_folder(folder, n):
 def execute_all():
     execute_all_folder('test_lexer', 11)
     execute_all_folder('test_syntax', 6)
+    execute_all_folder('test_semantic', 1)
 
 
 def main():
-    folder = 'test_syntax'
+    folder = 'test_semantic'
     execute_one(folder, f'code1_1')
-    # execute_all_folder(folder)
+    # execute_all_folder(folder, 2)
     # execute_all()
 
 

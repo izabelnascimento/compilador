@@ -1,0 +1,30 @@
+programa exemplo;
+
+inicio
+    var x: int;
+    x := 10;
+
+    var a: bool;
+    a := verdadeiro;
+
+    var b: int;
+    b := 5 + 3;
+
+    funcao soma(x: int, y: int): int
+    inicio
+        retorna x + y;
+    fim
+
+    var resultado: int;
+    resultado := chamar soma(5, 2);
+
+    funcao retornar_int(): int
+    inicio
+        retorna 42;
+    fim
+
+    var cond: bool := verdadeiro;
+    se (cond) entao
+        mostre "Tudo certo!";
+    fim
+fim
