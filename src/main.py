@@ -22,7 +22,7 @@ def execute_all():
 def main():
     folder = 'test_semantic'
     # execute_one(folder, f'code1_1')
-    execute_all_folder(folder, 4)
+    execute_all_folder(folder, 5)
     # execute_all()
 
 

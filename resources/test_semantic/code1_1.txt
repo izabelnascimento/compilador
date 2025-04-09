@@ -18,11 +18,6 @@ inicio
     var resultado: int;
     resultado => chamar soma(5, 2);
 
-    funcao retornar_int(dummy: int) retorna int;
-    inicio
-        retorna 42;
-    fim
-
     var cond: bool;
     cond => verdadeiro;
     se (cond) entao

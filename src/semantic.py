@@ -126,19 +126,22 @@ class Semantic:
         print("\n- Verificando chamadas de funções -")
         for symbol in self.symbol_table:
             if symbol.kind in ('FUNCTION', 'PROCEDURE'):
+                index = 0
                 for token in self.tokens:
-                    index = 0
-                    if token[0] == symbol.id and token[1] in ('FUNCTION', 'PROCEDURE'):
+                    if token[0] == symbol.id and self.tokens[index-1][1] in ('FUNCTION', 'PROCEDURE'):
                         args = list()
-                        index += 4
+                        index += 1
                         for i in range(index, len(self.tokens)):
-                            if self.tokens[i][1] == 'INT':
+                            actual_token = self.tokens[i]
+                            if actual_token[1] == 'INT':
                                 args.append('INT')
-                            elif self.tokens[i][1] == 'BOOL':
+                            elif actual_token[1] == 'BOOL':
                                 args.append('BOOL')
-                            elif self.tokens[i][1] == 'SEMICOLON':
+                            elif actual_token[1] == 'RPAREN':
                                 break
                         self.check_calls(args)
+                    else:
+                        index += 1
 
     def check_calls(self, args_defined):
         index = 0
@@ -154,8 +157,10 @@ class Semantic:
             token = self.tokens[index]
             if token[1] == 'NUMBER':
                 args.append('INT')
-            elif token[1] == 'BOOL':
+            elif token[1] in {'FALSE', 'TRUE'}:
                 args.append('BOOL')
+            elif token[1] == 'IDENTIFIER':
+                args.append(self.get_symbol_type_by_id(token[0]))
             elif token[1] == 'RPAREN':
                 break
             index += 1
@@ -163,3 +168,7 @@ class Semantic:
             raise SyntaxError(
                 f"[Erro] Argumentos inválidos na linha {line}. "
             )
+
+    def get_symbol_type_by_id(self, token_id):
+        symbol = self.find_symbol(token_id)
+        return symbol.kind

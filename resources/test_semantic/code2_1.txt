@@ -11,15 +11,6 @@ inicio
         mostre(resultado);
     fim
 
-    funcao verificar_par(valor: int) retorna bool;
-    inicio
-        se (valor % 2 == 0) entao
-            retorna verdadeiro;
-        senao
-            retorna falso;
-        fim
-    fim
-
     // Inicializando variáveis
     a => 10;
     b => 15;
@@ -28,7 +19,6 @@ inicio
     chamar calcular_soma(a, b);
 
     // Verificando condição, printa 2 se é par e 1 se ímpar
-    condicao => chamar verificar_par(resultado);
     se (condicao) entao
         mostre(2);
     senao
