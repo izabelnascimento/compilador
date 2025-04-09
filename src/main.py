@@ -18,11 +18,10 @@ def execute_all():
     execute_all_folder('test_syntax', 6)
     execute_all_folder('test_semantic', 2)
 
-
 def main():
-    folder = 'tag_generator'
-    execute_one(folder, f'code3_1')
-    # execute_all_folder(folder, 5)
+    folder = 'test_semantic'
+    execute_one(folder, f'code1_1')
+    #execute_all_folder(folder, 5)
     # execute_all()
 
 
