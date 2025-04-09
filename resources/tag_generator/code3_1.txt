@@ -1,0 +1,20 @@
+programa maior_exemplo;
+inicio
+    var a, b, c, d, resultado, temp1, temp2: int;
+
+    a => 4;
+    b => 3;
+    c => 2;
+    d => 10;
+
+    temp1 => a + b * c;
+    temp2 => temp1 - d;
+
+    se (temp2 > 0) entao
+        resultado => temp2;
+    senao
+        resultado => 0;
+    fim
+
+    mostre(resultado);
+fim

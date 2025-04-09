@@ -1,0 +1,10 @@
+programa exemplo;
+inicio
+var a, b, c, d, e: int;
+    a => 5;
+    b => 10;
+    c => a + b;
+    d => e * 2;
+    c => t2 - 3;
+    mostre(c);
+fim

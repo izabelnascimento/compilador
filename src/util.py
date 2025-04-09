@@ -56,3 +56,15 @@ class Util:
                     symbol.scope_id
                 ])
         print("Tabela de símbolos salva em 'symbol_table.csv'.")
+
+    @staticmethod
+    def save_three_address_code(folder, file_name, code):
+        dir_path = f'../resources/out/{folder}'
+        os.makedirs(dir_path, exist_ok=True)
+        file_path = f"{dir_path}/{file_name}.txt"
+
+        with open(file_path, "w") as f:
+            for line in code:
+                f.write(line + "\n")
+
+        print(f"\nCódigo de 3 endereços salvo em: {file_path}")

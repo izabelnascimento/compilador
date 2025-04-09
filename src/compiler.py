@@ -1,3 +1,4 @@
+from src.tag_generator import TACGenerator
 from src.lexer import Lexer
 from src.semantic import Semantic
 from src.syntax import Syntax
@@ -22,6 +23,11 @@ class Compiler:
                 try:
                     semantic = Semantic(tokens, symbol_table, folder, file_name)
                     semantic.start_semantic()
+                    try:
+                        address = TACGenerator(tokens, symbol_table, folder, file_name)
+                        address.generate()
+                    except SyntaxError as e:
+                        Util.print_error(f"\nErro durante a transformação para código de 3 endereços: {e}")
                 except SyntaxError as e:
                     Util.print_error(f"\nErro durante a análise semântica: {e}")
             except SyntaxError as e:
