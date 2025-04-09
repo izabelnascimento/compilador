@@ -61,10 +61,45 @@ class Semantic:
     # Verifica se existe return com tipo compatível nas funções.
     def check_function_returns(self):
         print("\n- Verificando compatibilidade do returns -")
+        for symbol in self.symbol_table:
+            if symbol.kind == 'FUNCTION':
+                expected_type = self.get_function_type(symbol)
+                return_token = self.find_next_token_in_function(symbol, 'RETURN')
+                if not return_token:
+                    raise SyntaxError(f"[Erro] Função '{symbol.name}' na linha {symbol.line} não possui retorno.")
+                actual_type = None
+                if return_token[1] == 'NUMBER':
+                    actual_type = 'INT'
+                elif return_token[1] in {'TRUE', 'FALSE'}:
+                    actual_type = 'BOOL'
+                elif return_token[1] == 'IDENTIFIER':
+                    ret_symbol = self.find_symbol(return_token[0])
+                    actual_type = ret_symbol.kind
+                if actual_type != expected_type:
+                    raise SyntaxError(
+                        f"[Erro] Tipo de retorno incompatível na função '{symbol.name}' (linha {symbol.line}). "
+                        f"Esperado: {expected_type}, encontrado: {actual_type or 'desconhecido'}."
+                    )
 
-   # Garante que as expressões condicionais em if e while são do tipo booleano.
+    # Garante que as expressões condicionais em if e while são do tipo booleano.
     def check_control_flow_conditions(self):
         print("\n- Verificando instrução de controle de fluxo -")
+        for i, token in enumerate(self.tokens):
+            if token[1] in {'IF', 'WHILE'}:
+                condition_token = self.tokens[i + 2]  # Considera estrutura tipo: SE ( condição ) ...
+                token_type = condition_token[1]
+                if token_type == 'IDENTIFIER':
+                    cond_symbol = self.find_symbol(condition_token[0])
+                    cond_type = cond_symbol.kind
+                elif token_type in {'TRUE', 'FALSE'}:
+                    cond_type = 'BOOL'
+                else:
+                    cond_type = 'INT'  # fallback
+
+                if cond_type != 'BOOL':
+                    raise SyntaxError(
+                        f"[Erro] Condição em '{token[1]}' na linha {token[3]} precisa ser do tipo booleano."
+                    )
 
     # check_declarations
     def contains(self, symbol, declared_symbols):
