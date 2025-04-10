@@ -19,84 +19,136 @@ class TACGenerator:
         i = 0
         while i < len(self.tokens):
             token = self.tokens[i]
-            # Detecta: IDENTIFIER => (ASSIGN) => valor ou expressão
-            if token[1] == "IDENTIFIER" and i + 1 < len(self.tokens) and self.tokens[i + 1][1] == "ASSIGN":
-                var_name = token[2]
-                assign_op = self.tokens[i + 1]
+            token_type = token[1]
 
-                if i + 2 >= len(self.tokens):
-                    raise SyntaxError(f"[Erro] Expressão ausente após atribuição na linha {token[3]}")
-
-                value_token = self.tokens[i + 2]
-
-                # Expressão simples? (como x => 5;)
-                if value_token[1] in ("NUMBER", "TRUE", "FALSE"):
-                    self.code.append(f"{var_name} = {value_token[2]}")
-                    i += 4  # pula até depois do ;
-                elif value_token[1] == "CALL":
-                    func_name = self.tokens[i+3][2]  # chamar NOME
-                    j = i + 4  # após CALL e IDENTIFIER, espera (
-                    if self.tokens[j][1] == "LPAREN":
-                        j += 1
-                        args = []
-                        while self.tokens[j][1] != "RPAREN":
-                            if self.tokens[j][1] in ("NUMBER", "IDENTIFIER", "TRUE", "FALSE"):
-                                args.append(self.tokens[j][2])
-                            j += 1
-                        call_temp = self.new_temp()
-                        self.code.append(f"{call_temp} = call {func_name}({', '.join(args)})")
-                        self.code.append(f"{var_name} = {call_temp}")
-                        i = j + 2  # pula RPAREN e SEMICOLON
-                else:
-                    expr_tokens = []
-                    j = i + 2
-                    while j < len(self.tokens) and self.tokens[j][1] != "SEMICOLON":
-                        expr_tokens.append(self.tokens[j])
-                        j += 1
-
-                    if j >= len(self.tokens):
-                        raise SyntaxError(f"[Erro] Ponto e vírgula não encontrado após expressão iniciada na linha {token[3]}")
-
-                    if not expr_tokens:
-                        raise SyntaxError(f"[Erro] Expressão inválida ou vazia após atribuição em {token[3]}")
-
-                    # print(f"Tokens da expressão de {var_name} na linha {token[3]}:")
-                    # for t in expr_tokens:
-                    #     print(f"  {t}")
-
-                    expr_code, result = self.handle_expression(expr_tokens)
-                    self.code.extend(expr_code)
-                    self.code.append(f"{var_name} = {result}")
-                    i = j + 1
-            elif token[1] == "SHOW":
-                if self.tokens[i+1][1] == "LPAREN" and self.tokens[i+2][1] == "IDENTIFIER" and self.tokens[i+3][1] == "RPAREN":
-                    var_name = self.tokens[i+2][2]
-                    self.code.append(f"print {var_name}")
-                    i += 5  # pula: SHOW, LPAREN, IDENTIFIER, RPAREN, SEMICOLON
-                else:
-                    i += 1
+            if token_type == "IDENTIFIER" and self._is_assignment(i):
+                i = self._handle_assignment(i)
+            elif token_type == "SHOW":
+                i = self._handle_show(i)
+            elif token_type == "IF":
+                i = self._handle_if(i)
             else:
                 i += 1
+
         for line in self.code:
             print(line)
         Util.save_three_address_code(self.folder, self.file_name, self.code)
         Util.print_sucess("\nGeração de código de 3 endereços concluída com sucesso.")
 
-    def handle_expression(self, expr_tokens):
-        """
-        Recebe tokens da expressão (ex: x + y * w)
-        Gera código de 3 endereços com precedência
-        Retorna lista de linhas de código e o resultado final (ex: t2)
-        """
-        ops_stack = []
-        vals_stack = []
-        code = []
+    def _is_assignment(self, i):
+        return i + 1 < len(self.tokens) and self.tokens[i + 1][1] == "ASSIGN"
 
+    def _handle_assignment(self, i):
+        var_name = self.tokens[i][2]
+        value_token = self.tokens[i + 2]
+
+        if value_token[1] in ("NUMBER", "TRUE", "FALSE"):
+            self.code.append(f"{var_name} = {value_token[2]}")
+            return i + 4  # pula até o ;
+
+        if value_token[1] == "CALL":
+            return self._handle_function_call_assignment(i, var_name)
+
+        return self._handle_expression_assignment(i, var_name)
+
+    def _handle_function_call_assignment(self, i, var_name):
+        func_name = self.tokens[i + 3][2]
+        j = i + 4  # após CALL e IDENTIFIER
+        args = []
+
+        while self.tokens[j][1] != "RPAREN":
+            if self.tokens[j][1] in ("NUMBER", "IDENTIFIER", "TRUE", "FALSE"):
+                args.append(self.tokens[j][2])
+            j += 1
+
+        call_temp = self.new_temp()
+        self.code.append(f"{call_temp} = call {func_name}({', '.join(args)})")
+        self.code.append(f"{var_name} = {call_temp}")
+        return j + 2  # pula RPAREN e SEMICOLON
+
+    def _handle_expression_assignment(self, i, var_name):
+        expr_tokens = []
+        j = i + 2
+        while j < len(self.tokens) and self.tokens[j][1] != "SEMICOLON":
+            expr_tokens.append(self.tokens[j])
+            j += 1
+
+        if not expr_tokens:
+            raise SyntaxError(f"[Erro] Expressão inválida ou vazia após atribuição em {self.tokens[i][3]}")
+
+        expr_code, result = self.handle_expression(expr_tokens)
+        self.code.extend(expr_code)
+        self.code.append(f"{var_name} = {result}")
+        return j + 1
+
+    def _handle_show(self, i):
+        if (i + 4 < len(self.tokens)
+                and self.tokens[i + 1][1] == "LPAREN"
+                and self.tokens[i + 2][1] == "IDENTIFIER"
+                and self.tokens[i + 3][1] == "RPAREN"):
+            var_name = self.tokens[i + 2][2]
+            self.code.append(f"print {var_name}")
+            return i + 5
+        return i + 1
+
+    def _handle_if(self, i):
+        if self.tokens[i + 1][1] != "LPAREN":
+            return i + 1
+
+        cond_tokens = []
+        j = i + 2
+        while self.tokens[j][1] != "RPAREN":
+            cond_tokens.append(self.tokens[j])
+            j += 1
+
+        cond_code, cond_expr = self.handle_condition(cond_tokens)
+        self.code.extend(cond_code)
+
+        label_true = f"L{self.temp_count + 1}"
+        label_end = f"L{self.temp_count + 2}"
+        self.code.append(f"if {cond_expr} goto {label_true}")
+        j += 1
+
+        if self.tokens[j][1] == "THEN":
+            j += 1
+
+        assign_false = self._collect_assignments(j, until=("ELSE", "ENDIF"))
+        j += len(assign_false) * 4
+
+        if self.tokens[j][1] == "ELSE":
+            self.code.extend(assign_false)
+            self.code.append(f"goto {label_end}")
+            self.code.append(f"{label_true}:")
+            j += 1
+
+            assign_true = self._collect_assignments(j, until=("END",))
+            self.code.extend(assign_true)
+            self.code.append(f"{label_end}:")
+            return j + len(assign_true) * 4 + 1
+        else:
+            self.code.append(f"{label_true}:")
+            self.code.extend(assign_false)
+            return j + 1
+
+    def _collect_assignments(self, start_idx, until):
+        assignments = []
+        j = start_idx
+        while self.tokens[j][1] not in until:
+            if (self.tokens[j][1] == "IDENTIFIER"
+                    and self.tokens[j + 1][1] == "ASSIGN"):
+                var = self.tokens[j][2]
+                val = self.tokens[j + 2][2]
+                assignments.append(f"{var} = {val}")
+                j += 4
+            else:
+                j += 1
+        return assignments
+
+    def handle_expression(self, expr_tokens):
+        ops_stack, vals_stack, code = [], [], []
         precedence = {"*": 2, "/": 2, "+": 1, "-": 1}
 
         def apply_op():
-            if len(vals_stack) < 2:
-                raise ValueError("Expressão inválida: operadores em excesso ou operandos em falta.")
             right = vals_stack.pop()
             left = vals_stack.pop()
             op = ops_stack.pop()
@@ -104,37 +156,24 @@ class TACGenerator:
             code.append(f"{temp} = {left} {op} {right}")
             vals_stack.append(temp)
 
-        i = 0
-        while i < len(expr_tokens):
-            token = expr_tokens[i]
+        for token in expr_tokens:
             if token[1] in ("IDENTIFIER", "NUMBER", "TRUE", "FALSE"):
-                if token[1] == "TRUE":
-                    vals_stack.append("1")
-                elif token[1] == "FALSE":
-                    vals_stack.append("0")
-                else:
-                    vals_stack.append(token[2])
+                vals_stack.append("1" if token[1] == "TRUE" else "0" if token[1] == "FALSE" else token[2])
             elif token[1] in ("PLUS", "MINUS", "MULTIPLY", "DIVIDE"):
                 op = token[2]
                 while ops_stack and precedence[op] <= precedence.get(ops_stack[-1], 0):
                     apply_op()
                 ops_stack.append(op)
-            i += 1
 
         while ops_stack:
             apply_op()
 
-        if not vals_stack:
-            raise ValueError("Erro na expressão: nenhum valor encontrado.")
-
-        return code[-(len(vals_stack) - 1):], vals_stack[-1]
+        return code, vals_stack[-1]
 
     def handle_condition(self, cond_tokens):
         code = []
         if len(cond_tokens) == 3:
-            left = cond_tokens[0][2]
-            op = cond_tokens[1][2]
-            right = cond_tokens[2][2]
+            left, op, right = cond_tokens[0][2], cond_tokens[1][2], cond_tokens[2][2]
             temp = self.new_temp()
             code.append(f"{temp} = {left} {op} {right}")
             return code, f"{left} {op} {right}"
