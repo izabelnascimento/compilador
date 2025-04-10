@@ -1,5 +1,6 @@
 from src.util import Util
 
+
 class TACGenerator:
     def __init__(self, tokens, symbol_table, folder, file_name):
         self.tokens = tokens
@@ -29,12 +30,24 @@ class TACGenerator:
                 value_token = self.tokens[i + 2]
 
                 # Expressão simples? (como x => 5;)
-                if value_token[1] == "NUMBER":
+                if value_token[1] in ("NUMBER", "TRUE", "FALSE"):
                     self.code.append(f"{var_name} = {value_token[2]}")
                     i += 4  # pula até depois do ;
-
+                elif value_token[1] == "CALL":
+                    func_name = self.tokens[i+3][2]  # chamar NOME
+                    j = i + 4  # após CALL e IDENTIFIER, espera (
+                    if self.tokens[j][1] == "LPAREN":
+                        j += 1
+                        args = []
+                        while self.tokens[j][1] != "RPAREN":
+                            if self.tokens[j][1] in ("NUMBER", "IDENTIFIER", "TRUE", "FALSE"):
+                                args.append(self.tokens[j][2])
+                            j += 1
+                        call_temp = self.new_temp()
+                        self.code.append(f"{call_temp} = call {func_name}({', '.join(args)})")
+                        self.code.append(f"{var_name} = {call_temp}")
+                        i = j + 2  # pula RPAREN e SEMICOLON
                 else:
-                    # Expressão complexa (ex: z => x + y * w)
                     expr_tokens = []
                     j = i + 2
                     while j < len(self.tokens) and self.tokens[j][1] != "SEMICOLON":
@@ -47,14 +60,21 @@ class TACGenerator:
                     if not expr_tokens:
                         raise SyntaxError(f"[Erro] Expressão inválida ou vazia após atribuição em {token[3]}")
 
-                    print(f"Tokens da expressão de {var_name} na linha {token[3]}:")
-                    for t in expr_tokens:
-                        print(f"  {t}")
+                    # print(f"Tokens da expressão de {var_name} na linha {token[3]}:")
+                    # for t in expr_tokens:
+                    #     print(f"  {t}")
 
                     expr_code, result = self.handle_expression(expr_tokens)
                     self.code.extend(expr_code)
                     self.code.append(f"{var_name} = {result}")
-                    i = j + 1  # pula até depois do ;
+                    i = j + 1
+            elif token[1] == "SHOW":
+                if self.tokens[i+1][1] == "LPAREN" and self.tokens[i+2][1] == "IDENTIFIER" and self.tokens[i+3][1] == "RPAREN":
+                    var_name = self.tokens[i+2][2]
+                    self.code.append(f"print {var_name}")
+                    i += 5  # pula: SHOW, LPAREN, IDENTIFIER, RPAREN, SEMICOLON
+                else:
+                    i += 1
             else:
                 i += 1
         for line in self.code:
@@ -96,7 +116,7 @@ class TACGenerator:
                     vals_stack.append(token[2])
             elif token[1] in ("PLUS", "MINUS", "MULTIPLY", "DIVIDE"):
                 op = token[2]
-                while (ops_stack and precedence[op] <= precedence.get(ops_stack[-1], 0)):
+                while ops_stack and precedence[op] <= precedence.get(ops_stack[-1], 0):
                     apply_op()
                 ops_stack.append(op)
             i += 1

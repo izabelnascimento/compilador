@@ -115,7 +115,6 @@ class Semantic:
             else:
                 i += 1
 
-
     def check_control_flow_conditions(self):
         print("\n- Verificando instrução de controle de fluxo -")
         for i, token in enumerate(self.tokens):
@@ -221,9 +220,9 @@ class Semantic:
         for symbol in self.symbol_table:
             line = symbol.line
             if symbol.id == token_id:
-                print(f"✔️ Encontrado símbolo '{symbol.name}' (tipo: {symbol.kind}) na linha {symbol.line}")
+                # print(f"✔️ Encontrado símbolo '{symbol.name}' (tipo: {symbol.kind}) na linha {symbol.line}")
                 return symbol
-        print(f"❌ Token ID {token_id} não encontrado na tabela de símbolos.")
+        # print(f"❌ Token ID {token_id} não encontrado na tabela de símbolos.")
         raise SyntaxError(
             f"[Erro] Atribuição de tipo errada na linha {line}."
         )
