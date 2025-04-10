@@ -25,7 +25,7 @@ class Compiler:
                     semantic.start_semantic()
                     try:
                         address = TACGenerator(tokens, symbol_table, folder, file_name)
-                        address.generate()
+                        # address.generate()
                     except SyntaxError as e:
                         Util.print_error(f"\nErro durante a transformação para código de 3 endereços: {e}")
                 except SyntaxError as e:
