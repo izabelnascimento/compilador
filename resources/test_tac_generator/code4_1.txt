@@ -15,15 +15,13 @@ inicio
     resultado => chamar somar(x, y);
 
     se (resultado > 10) entao
-        mostre(verdadeiro);
+        condicao => verdadeiro;
     senao
-        mostre(falso);
+        condicao => falso;
     fim
 
-    condicao => verdadeiro;
-
     enquanto (condicao) faca
-        condicao => falso;
+        mostre(condicao);
     fim
 
 fim

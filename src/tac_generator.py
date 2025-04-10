@@ -9,10 +9,15 @@ class TACGenerator:
         self.file_name = file_name
         self.code = []
         self.temp_count = 0
+        self.label_count = 0  # novo contador de labels
 
     def new_temp(self):
         self.temp_count += 1
         return f"t{self.temp_count}"
+
+    def new_label(self):
+        self.label_count += 1
+        return f"L{self.label_count}"
 
     def generate(self):
         print("\n------------------- TRADUÇÃO CÓDIGO DE 3 ENDEREÇOS -------------------")
@@ -44,7 +49,7 @@ class TACGenerator:
 
         if value_token[1] in ("NUMBER", "TRUE", "FALSE"):
             self.code.append(f"{var_name} = {value_token[2]}")
-            return i + 4  # pula até o ;
+            return i + 4
 
         if value_token[1] == "CALL":
             return self._handle_function_call_assignment(i, var_name)
@@ -53,7 +58,7 @@ class TACGenerator:
 
     def _handle_function_call_assignment(self, i, var_name):
         func_name = self.tokens[i + 3][2]
-        j = i + 4  # após CALL e IDENTIFIER
+        j = i + 4
         args = []
 
         while self.tokens[j][1] != "RPAREN":
@@ -64,7 +69,7 @@ class TACGenerator:
         call_temp = self.new_temp()
         self.code.append(f"{call_temp} = call {func_name}({', '.join(args)})")
         self.code.append(f"{var_name} = {call_temp}")
-        return j + 2  # pula RPAREN e SEMICOLON
+        return j + 2
 
     def _handle_expression_assignment(self, i, var_name):
         expr_tokens = []
@@ -100,49 +105,51 @@ class TACGenerator:
         while self.tokens[j][1] != "RPAREN":
             cond_tokens.append(self.tokens[j])
             j += 1
+        j += 1  # pula RPAREN
 
         cond_code, cond_expr = self.handle_condition(cond_tokens)
         self.code.extend(cond_code)
 
-        label_true = f"L{self.temp_count + 1}"
-        label_end = f"L{self.temp_count + 2}"
+        label_true = self.new_label()
+        label_false = self.new_label()
+        label_end = self.new_label()
+
         self.code.append(f"if {cond_expr} goto {label_true}")
-        j += 1
+        self.code.append(f"goto {label_false}")
 
         if self.tokens[j][1] == "THEN":
             j += 1
 
-        assign_false = self._collect_assignments(j, until=("ELSE", "ENDIF"))
-        j += len(assign_false) * 4
+        self.code.append(f"{label_true}:")
+        then_code, j = self._collect_statements(j, until=("ELSE", "ENDIF", "END"))
+        self.code.extend(then_code)
+        self.code.append(f"goto {label_end}")
 
         if self.tokens[j][1] == "ELSE":
-            self.code.extend(assign_false)
-            self.code.append(f"goto {label_end}")
-            self.code.append(f"{label_true}:")
             j += 1
-
-            assign_true = self._collect_assignments(j, until=("END",))
-            self.code.extend(assign_true)
-            self.code.append(f"{label_end}:")
-            return j + len(assign_true) * 4 + 1
+            self.code.append(f"{label_false}:")
+            else_code, j = self._collect_statements(j, until=("ENDIF", "END"))
+            self.code.extend(else_code)
         else:
-            self.code.append(f"{label_true}:")
-            self.code.extend(assign_false)
-            return j + 1
+            self.code.append(f"{label_false}:")
 
-    def _collect_assignments(self, start_idx, until):
-        assignments = []
-        j = start_idx
-        while self.tokens[j][1] not in until:
-            if (self.tokens[j][1] == "IDENTIFIER"
-                    and self.tokens[j + 1][1] == "ASSIGN"):
-                var = self.tokens[j][2]
-                val = self.tokens[j + 2][2]
-                assignments.append(f"{var} = {val}")
-                j += 4
+        self.code.append(f"{label_end}:")
+
+        if self.tokens[j][1] in ("ENDIF", "END"):
+            return j + 1
+        return j
+
+    def _collect_statements(self, start_idx, until):
+        code = []
+        i = start_idx
+        while i < len(self.tokens) and self.tokens[i][1] not in until:
+            if self.tokens[i][1] == "IDENTIFIER" and self._is_assignment(i):
+                i = self._handle_assignment(i)
+            elif self.tokens[i][1] == "SHOW":
+                i = self._handle_show(i)
             else:
-                j += 1
-        return assignments
+                i += 1
+        return code, i
 
     def handle_expression(self, expr_tokens):
         ops_stack, vals_stack, code = [], [], []
@@ -176,5 +183,5 @@ class TACGenerator:
             left, op, right = cond_tokens[0][2], cond_tokens[1][2], cond_tokens[2][2]
             temp = self.new_temp()
             code.append(f"{temp} = {left} {op} {right}")
-            return code, f"{left} {op} {right}"
+            return code, temp
         return code, ""
