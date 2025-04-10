@@ -7,7 +7,7 @@ inicio
 
     procedimento calcular_soma(x: int, y: int);
     inicio
-        resultado => x + y / 2 * 4 - 2 % 5;
+        resultado => x + y / 2 * 4 - 2 * 5;
         mostre(resultado);
     fim
 

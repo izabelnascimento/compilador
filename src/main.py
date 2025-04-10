@@ -18,11 +18,12 @@ def execute_all():
     execute_all_folder('test_lexer', 11)
     execute_all_folder('test_syntax', 6)
     execute_all_folder('test_semantic', 5)
+    execute_all_folder('test_tac_generator', 5)
 
 
 def main():
-    folder = 'test_tac_generator'
-    execute_one(folder, f'code4_1')
+    folder = 'test_semantic'
+    execute_one(folder, f'code2_1')
     # execute_all_folder(folder, 5)
     # execute_all()
 
