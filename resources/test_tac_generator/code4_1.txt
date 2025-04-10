@@ -1,0 +1,29 @@
+programa Exemplo;
+
+inicio
+    var x, y, resultado: int;
+    var condicao: bool;
+
+    funcao somar(a: int, b: int) retorna int;
+    inicio
+        retorna a + b;
+    fim
+
+    x => 5;
+    y => 10;
+
+    resultado => chamar somar(x, y);
+
+    se (resultado > 10) entao
+        mostre(verdadeiro);
+    senao
+        mostre(falso);
+    fim
+
+    condicao => verdadeiro;
+
+    enquanto (condicao) faca
+        condicao => falso;
+    fim
+
+fim
