@@ -32,6 +32,8 @@ class TACGenerator:
                 i = self._handle_show(i)
             elif token_type == "IF":
                 i = self._handle_if(i)
+            elif token_type == "WHILE":
+                i = self._handle_while(i)
             else:
                 i += 1
 
@@ -136,6 +138,40 @@ class TACGenerator:
         self.code.append(f"{label_end}:")
 
         if self.tokens[j][1] in ("ENDIF", "END"):
+            return j + 1
+        return j
+
+    def _handle_while(self, i):
+        if self.tokens[i + 1][1] != "LPAREN":
+            return i + 1
+
+        cond_tokens = []
+        j = i + 2
+        while self.tokens[j][1] != "RPAREN":
+            cond_tokens.append(self.tokens[j])
+            j += 1
+        j += 1  # pula RPAREN
+
+        cond_code, cond_expr = self.handle_condition(cond_tokens)
+        self.code.extend(cond_code)
+
+        label_true = self.new_label()
+        label_false = self.new_label()
+        label_end = self.new_label()
+
+        self.code.append(f"while {cond_expr} goto {label_true}")
+        self.code.append(f"goto {label_false}")
+
+        if self.tokens[j][1] == "DO":
+            j += 1
+
+        self.code.append(f"{label_true}:")
+        then_code, j = self._collect_statements(j, until=("END"))
+        self.code.extend(then_code)
+        self.code.append(f"goto {label_end}")
+        self.code.append(f"{label_false}:")
+
+        if self.tokens[j][1] == "END":
             return j + 1
         return j
 

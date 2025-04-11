@@ -10,13 +10,11 @@ inicio
         resultado => x + y / 2 * 4 - 2 * 5;
         mostre(resultado);
     fim
-
+    chamar calcular_soma(1, 2);
     // Inicializando variáveis
     a => 10;
     b => 15;
-
-    // Chamando procedimento
-    chamar calcular_soma(a, b);
+    var z: int;
 
     // Verificando condição, printa 2 se é par e 1 se ímpar
     se (condicao) entao
